@@ -190,3 +190,23 @@ plot_grid(willamette_inset_plot, NULL, yakima_inset_plot,
 ggsave("figures/agu_poster/fig2_insets.pdf", 
        width = 12, height = 4)
 
+
+## Alternative of inset plots that are colored by type
+regression_estimates %>% 
+  clean_names() %>% 
+  mutate(quantile = fct_relevel(quantile, "Q100", after = Inf)) %>% 
+  mutate(r_squared = round(r_squared, 2)) %>% 
+  mutate(scaling = case_when(slope_ci_2_5 <= 1 & slope_ci_97_5 >= 1 & r_squared > 0.8 ~ "Linear", 
+                             slope_ci_2_5 < 1 & slope_ci_97_5 < 1 & r_squared > 0.8 ~ "Sublinear", 
+                             slope_ci_2_5 > 1 & slope_ci_97_5 > 1 & r_squared > 0.8 ~ "Super-linear", 
+                             TRUE ~ "Uncertain")) %>% 
+  select(basin, quantile, r_squared, slope, contains("slope_ci"), scaling) %>% 
+  ggplot(aes(x = quantile)) + 
+  geom_point(aes(y = slope, color = scaling), size = 4.5) +
+  geom_errorbar(aes(ymin = slope_ci_2_5, ymax = slope_ci_97_5), width = 0.2) + 
+  geom_hline(yintercept = 1) + 
+  facet_wrap(~basin) + 
+  scale_y_continuous(limits = c(0.35, 1.7), breaks = c(0.5, 0.75, 1.0, 1.25, 1.50)) +
+  scale_x_discrete(labels = c("10", "20", "30", "40", "50", "60", "70", "80", "90", "100")) + 
+  scale_color_manual(values = c("gray", "blue", "forestgreen", "red"))
+

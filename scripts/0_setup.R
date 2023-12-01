@@ -3,6 +3,7 @@
 require(pacman)
 p_load(tidyverse,
        cowplot,
+       janitor,
        scales, #trans_format()
        PNWColors)
 
