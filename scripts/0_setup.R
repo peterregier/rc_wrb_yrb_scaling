@@ -4,6 +4,7 @@ require(pacman)
 p_load(tidyverse,
        cowplot,
        janitor,
+       sf, 
        scales, #trans_format()
        PNWColors)
 
@@ -36,4 +37,7 @@ theme_httn<-  theme(axis.text=element_text(colour="black",size=22),
                     legend.key.size = unit(1.0, 'lines'),#Changing spacing between legend keys
                     legend.title = element_text())
 
+common_crs = 4326
 
+## Coordinate projection for coord_sf to make things look cool
+coord_sf_crs = "+proj=aea +lat_1=25 +lat_2=50 +lon_0=-100"

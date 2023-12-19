@@ -16,7 +16,7 @@ mi_n <- mi %>%
                               variable == "forest_3scp" ~ "Forest (%)",
                               variable == "shrub_3scp" ~ "Shrubland (%)",
                               variable == "human_3scp" ~ "Human-modified (%)",
-                              variable == "hrel_3" ~ "hrel_3",
+                              variable == "hrel_3" ~ "Landscape entropy",
                               variable == "simpson_d3" ~ "Simpson's diversity index"))
  
 ## set up a color scheme for water quality
@@ -41,15 +41,19 @@ make_mi_plot <- function(data, title){
   ggplot(data, 
          aes(reorder(variable, accm_totco2_o2g_day_n), fill = variable)) + 
     geom_col(aes(y = accm_totco2_o2g_day_n), show.legend = F) + 
-    labs(x = "Predictor", y = "Normalized \n mutual information", title = title) + 
+    labs(x = "", y = "Normalized \n mutual information", title = title) + 
     coord_flip() + 
-    theme(plot.title = element_text(hjust = 0.5)) + 
+    theme(plot.title = element_text(hjust = 0.5), 
+          axis.text=element_text(size=12),
+          axis.title=element_text(size=14,face="bold"), 
+          axis.text.y = element_text(angle = 30, vjust = 0.5, hjust=1)) + 
     scale_fill_manual(values = mi_colors$colors)
 }                            
           
-plot_grid(make_mi_plot(mi_n %>% filter(basin == "WRB"), "Mutual information - WRB"), 
+plot_grid(make_mi_plot(mi_n %>% filter(basin == "WRB"), "Willamette (WRB)"), 
           NULL,
-          make_mi_plot(mi_n %>% filter(basin == "YRB"), "Mutual information - YRB"), 
+          make_mi_plot(mi_n %>% filter(basin == "YRB"), "Yakima (YRB)"), 
           nrow = 1, rel_widths = c(1, 0.1, 1))
 ggsave("figures/agu_poster/231130_mutal_information.png", 
        width = 11, height = 5)
+

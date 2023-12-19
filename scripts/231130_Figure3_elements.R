@@ -15,14 +15,6 @@ scaling_map_dat <- scaling_analysis_dat %>%
                  accm_hzt_cat) %>% 
   mutate(
     quantile_num = as.numeric(sub("[^0-9]+", "", accm_hzt_cat)),
-    # scaling_cat = 
-    #   case_when(basin == "willamette" & quantile_num >= 60 ~ "Superlinear",
-    #             basin == "willamette" & quantile_num >= 40 & quantile_num < 60 ~ "Linear",
-    #             basin == "willamette" & quantile_num < 40 ~ "Uncertain",
-    #             basin == "yakima" & quantile_num >= 80 ~ "Superlinear",
-    #             basin == "yakima" & quantile_num == 70 ~ "Linear",
-    #             basin == "yakima" & quantile_num >= 40 & quantile_num < 70 ~ "Sub-linear",
-    #             basin == "yakima" & quantile_num < 40 ~"Uncertain"),
     scaling_cat = 
       case_when(basin == "willamette" & quantile_num >= 60 ~ "Superlinear",
                 basin == "willamette" & quantile_num >= 40 & quantile_num < 60 ~ "Linear",
