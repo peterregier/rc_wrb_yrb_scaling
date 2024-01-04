@@ -5,6 +5,7 @@ p_load(tidyverse,
        cowplot,
        janitor,
        sf, 
+       nhdplusTools,
        scales, #trans_format()
        PNWColors)
 

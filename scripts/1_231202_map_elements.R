@@ -2,6 +2,7 @@
 
 require(pacman)
 p_load(tidyverse, 
+       janitor,
        rnaturalearth,
        nhdplusTools,
        ggthemes,
@@ -70,41 +71,89 @@ scaling_map_dat <- scaling_analysis_dat %>%
   mutate(log_mean_ann_pcpt_mm = log(mean_ann_pcpt_mm)) %>% 
   mutate(dominant_lc = colnames(select(., contains("_3scp")))[max.col(select(., contains("_3scp")), "first")])
 
-scaling_map_sf <- scaling_map_dat %>% 
-  select(basin_cat,
+scaling_dat_trimmed <- scaling_map_dat %>% 
+  select(comid, 
+         basin_cat,
          basin,
+         wshd_area_km2, 
+         accm_hzt_cat,
+         accm_totco2_o2g_day, 
          longitude,
          latitude,
          log_mean_ann_pcpt_mm, 
          wshd_avg_elevation_m, 
-         dominant_lc) %>% 
-  st_as_sf(coords = c("longitude", "latitude"), crs = common_crs) 
+         dominant_lc)
+
+scaling_map_sf <- inner_join(nsi %>% clean_names(), 
+                             scaling_dat_trimmed, by = "comid")
 
 
 ## 3. Make plot function -------------------------------------------------------
+generate_faceted_map <- function(data, var, color_label, trans_function){
+  
+  color_alpha = 1
+  min_color <- min(data %>% dplyr::pull({{var}}), na.rm = T)
+  max_color <- max(data %>% dplyr::pull({{var}}), na.rm = T)
+  
+  wrb <- ggplot() + 
+    geom_sf(data = data %>% filter(basin == "willamette"), 
+            aes(color = {{var}}), alpha = color_alpha) + 
+    scale_color_viridis_c(limits = c(min_color, max_color), trans = trans_function) + 
+    theme_map()
+  
+  yrb <- ggplot() + 
+    geom_sf(data = data %>% filter(basin == "yakima"), 
+            aes(color = {{var}}), alpha = color_alpha) + 
+    scale_color_viridis_c(limits = c(min_color, max_color), trans = trans_function) + 
+    theme_map() + 
+    labs(color = color_label)
+  
+  legend = get_legend(yrb)
+  
+  plots <- plot_grid(yrb + theme(legend.position = "none"), 
+            wrb + theme(legend.position = "none"), 
+            ncol = 1, 
+            rel_heights = c(0.8, 1))
+  
+  plot_grid(plots, legend, nrow = 1, rel_widths = c(1, 0.5))
+    
+}
+
+respiration_plot <- generate_faceted_map(scaling_map_sf, accm_totco2_o2g_day, "C. Resp.", "log10") 
+hex_plot <- generate_faceted_map(scaling_map_sf, accm_hzt_cat, "C. HEX", 1) # not working because need to define default transform
+
+
+
+
+
+##### GRAVEYARD ######
+
+
 generate_plot <- function(data, aes_color_var, scale_color_func, color_name, title, ncols, add_y_axis_label = FALSE, ...) {
-  plot <- #ggplot(data, aes(x = longitude, y = latitude)) +
-    #geom_point(aes(color = .data[[aes_color_var]])) +
-    ggplot() + 
+  plot <- ggplot() + 
     geom_sf(data = data, aes(color = .data[[aes_color_var]])) + 
     scale_color_func(name = color_name, ...) +
+    #coord_sf(coord_sf_crs) + 
     facet_wrap(~basin_cat, ncol = ncols, scales = "free") +
-    labs(title = title) +
-    theme(
-      legend.position = c(0.8, 0.35),
-      legend.background = element_blank(), 
-      legend.box.background = element_blank(),
-      legend.title = element_text(size = 12, face = "bold"),
-      legend.text = element_text(size = 10),
-      axis.title = element_blank(),
-      axis.text = element_text(size = 14),
-      plot.title = element_text(size = 20, face = "bold"),
-      strip.background = element_blank(),
-      strip.text = element_blank()
-    )
+    labs(title = title) #+
+    # theme(
+    #   legend.position = c(0.8, 0.35),
+    #   legend.background = element_blank(), 
+    #   legend.box.background = element_blank(),
+    #   legend.title = element_text(size = 12, face = "bold"),
+    #   legend.text = element_text(size = 10),
+    #   axis.title = element_blank(),
+    #   axis.text = element_text(size = 14),
+    #   plot.title = element_text(size = 20, face = "bold"),
+    #   strip.background = element_blank(),
+    #   strip.text = element_blank()
+    # )
   
   return(plot)
 }
+
+
+generate_plot(scaling_map_sf, "accm_totco2_o2g_day", scale_color_viridis_c, "Cumulative \nRespiration (g/d)", "Respiration", 1)
 
 
 ## 2. Make precip maps
