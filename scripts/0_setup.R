@@ -1,14 +1,20 @@
 ## Setup file for consistency across scripts
 
+## Load packages
 require(pacman)
 p_load(tidyverse,
        cowplot,
        janitor,
        sf, 
        nhdplusTools,
+       tmaptools,
+       rnaturalearth, 
+       ggthemes, 
+       ggallin,
        scales, #trans_format()
        PNWColors)
 
+## Set ggplot theme default
 theme_set(theme_bw())
 
 ## Core dataset that's used for most things, so load it
@@ -38,6 +44,7 @@ theme_httn<-  theme(axis.text=element_text(colour="black",size=22),
                     legend.key.size = unit(1.0, 'lines'),#Changing spacing between legend keys
                     legend.title = element_text())
 
+## Set common CRS so everything is projected the same way
 common_crs = 4326
 
 ## Coordinate projection for coord_sf to make things look cool

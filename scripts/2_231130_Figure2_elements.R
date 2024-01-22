@@ -80,7 +80,7 @@ plot_yakima
 
 
 # Loading regression estimates dataset
-regression_estimates <-  read_csv("data/guerrero_etal_23_results_cross_validation_block_bootstrap_scaling.csv")
+regression_estimates <- read_csv("data/guerrero_etal_23_results_cross_validation_block_bootstrap_scaling.csv")
 
 ## Prep data
 reg_estimates_long <- regression_estimates %>% 
