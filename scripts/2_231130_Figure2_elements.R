@@ -1,10 +1,22 @@
 ## This script takes Fco's code from https://github.com/Scaling-Watershed-Function/2-swf-analytical.engine
 ## as of 11/30/23 and recreates Figure 2 elements so I can edit for AGU poster
+## 
+## INPUTS: 
+### scaling_analysis_dat (via 0_setup.R)
+### guerrero_etal_23_results_cross_validation_block_bootstrap_scaling.csv
 ##
+## Peter Regier (some code from Francisco)
+## 2023-11-30
+##
+# ######### #
+# ######### #
+
+# 1. Setup ---------------------------------------------------------------------
 
 source("scripts/0_setup.R")
 
 
+# 2. Plotting function from Fco ------------------------------------------------
 
 create_faceted_plots <- function(data, selected_basin) {
   
@@ -68,7 +80,7 @@ create_faceted_plots <- function(data, selected_basin) {
 }
 
 
-# Main Plots
+# 3. Make main plots -----------------------------------------------------------
 
 #Willamette
 plot_willamette <- create_faceted_plots(scaling_analysis_dat, "willamette")
@@ -79,10 +91,12 @@ plot_yakima <- create_faceted_plots(scaling_analysis_dat, "yakima")
 plot_yakima
 
 
-# Loading regression estimates dataset
+# 4. Load regression data ------------------------------------------------------
+
+# Load regression estimates dataset
 regression_estimates <- read_csv("data/guerrero_etal_23_results_cross_validation_block_bootstrap_scaling.csv")
 
-## Prep data
+## Prep regression data
 reg_estimates_long <- regression_estimates %>% 
   select(basin,
          quantile,
@@ -99,6 +113,9 @@ reg_estimates_long <- regression_estimates %>%
          c(3:4))
 
 
+# 5. Make inset plots ----------------------------------------------------------
+
+## Function for regression plot insets
 reg_inset_plot <- function(selected_basin) {
   plot <- ggplot(
     data = reg_estimates_long %>% 
@@ -145,7 +162,7 @@ reg_inset_plot <- function(selected_basin) {
   return(plot)
 }
 
-# Willamette
+# WRB inset plot
 willamette_inset_plot <- reg_inset_plot(
   selected_basin = "willamette"
 )
@@ -163,7 +180,7 @@ w_scaling_grob <- plot_willamette +
   )
 w_scaling_grob
 
-# Yakima
+# Yakima inset plot
 yakima_inset_plot <- reg_inset_plot(
   selected_basin = "yakima"
 )
@@ -180,6 +197,9 @@ y_scaling_grob <- plot_yakima +
     xmax = 0.6
   )
 y_scaling_grob
+
+
+# 6. Make final plots and 
 
 plot_grid(w_scaling_grob, y_scaling_grob, nrow = 1)
 ggsave("figures/agu_poster/og_figure2.pdf", width = 24, height = 10)

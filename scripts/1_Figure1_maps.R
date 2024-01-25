@@ -14,6 +14,7 @@ source("scripts/0_setup.R")
 
 # 2. Prep watershed boundaries and flowlines -----------------------------------
 
+## Read in shapefiles with flowlines for the two study basins
 nsi <- read_sf("data/nsi_network_ywrb/nsi_network_ywrb.shp") %>% 
   st_transform(crs = common_crs)
 
@@ -37,6 +38,7 @@ states <- ne_states(country = "united states of america",
                     returnclass = "sf") %>% 
   filter(gn_name == "Oregon" | gn_name == "Washington")
 
+## Create map layer with the two states containing study basins
 wa_or_plot <- ggplot() + 
   geom_sf(data = states, fill = "gray95") + 
   geom_sf(data = yakima_boundary, fill = "gray50", alpha = 0.2) + 
@@ -52,10 +54,12 @@ wa_or_plot <- ggplot() +
 
 # 4. Prep dataset --------------------------------------------------------------
 
+## Prep scaling_analysis_dat
 scaling_map_dat <- scaling_analysis_dat %>% 
   mutate(log_mean_ann_pcpt_mm = log(mean_ann_pcpt_mm)) %>% 
   mutate(dominant_lc = colnames(select(., contains("_3scp")))[max.col(select(., contains("_3scp")), "first")])
 
+## Prep scaling_analysis_dat
 scaling_dat_trimmed <- scaling_map_dat %>% 
   select(comid, 
          basin_cat,
@@ -69,6 +73,7 @@ scaling_dat_trimmed <- scaling_map_dat %>%
          wshd_avg_elevation_m, 
          dominant_lc)
 
+## Convert prepped dataset to an sf object for plotting
 scaling_map_sf <- inner_join(nsi %>% clean_names(), 
                              scaling_dat_trimmed, by = "comid")
 
@@ -79,7 +84,7 @@ scaling_map_sf <- inner_join(nsi %>% clean_names(),
 min_resp = min(scaling_dat_trimmed$accm_totco2_o2g_day)
 max_resp = max(scaling_dat_trimmed$accm_totco2_o2g_day)
 
-
+## Make a respiration map for the YRB
 yrb_resp <- ggplot() +
   geom_sf(data = scaling_map_sf %>% filter(basin == "yakima"), 
           aes(color = accm_totco2_o2g_day), show.legend = F) + 
@@ -90,6 +95,7 @@ yrb_resp <- ggplot() +
   theme(legend.position = c(0.8, 0.7), 
         legend.background = element_blank())
 
+## Make a respiration map for the WRB
 wrb_resp <- ggplot() +
   geom_sf(data = scaling_map_sf %>% filter(basin == "willamette"), aes(color = accm_totco2_o2g_day)) + 
   geom_sf(data = willamette_boundary, fill = NA, color = "black") + 
@@ -98,33 +104,13 @@ wrb_resp <- ggplot() +
   labs(color = "Cumulative \n Respiration \n (gCO2/d)")
 
 
-# 6. Make HEF maps -----------------------------------------------------
+# 6. Assemble plots and export -------------------------------------------------
 
-## First, reorder the HEF levels
-scaling_map_sf$accm_hzt_cat <- fct_relevel(scaling_map_sf$accm_hzt_cat, "Q100", after = Inf)
-
-yrb_hef <- ggplot() +
-  geom_sf(data = scaling_map_sf %>% filter(basin == "yakima"), 
-          aes(color = accm_hzt_cat), show.legend = F) + 
-  geom_sf(data = yakima_boundary, fill = NA, color = "black") + 
-  scale_color_viridis_d() + 
-  theme_map() + 
-  labs(color = "HEF quantile") + 
-  theme(legend.position = c(0.8, 0.7), 
-        legend.background = element_blank())
-
-wrb_hef <- ggplot() +
-  geom_sf(data = scaling_map_sf %>% filter(basin == "willamette"), aes(color = accm_hzt_cat)) + 
-  geom_sf(data = willamette_boundary, fill = NA, color = "black") + 
-  scale_color_viridis_d() + 
-  theme_map() + 
-  labs(color = "HEF quantile")
-
-
-# 7. Assemble plots and export -------------------------------------------------
-
+## Pull the legend as a separate object
 resp_legend = get_legend(wrb_resp + 
                            theme(legend.position = c(0.5, 0.3)))
+
+## Create the final plot by combining plot objects
 plot_grid(wa_or_plot, 
           yrb_resp, 
           wrb_resp + theme(legend.position = "none"),
@@ -133,7 +119,31 @@ plot_grid(wa_or_plot,
           rel_widths = c(1, 1, 0.9, 0.4), 
           labels = c("A", "B", "C"))
           
-
+## Save layers as raw figure, which is then cleaned up in Affinity Designer
 ggsave("figures/raw_Figure1_maps.pdf", width = 12, height = 4)
 
+
+#### GRAVEYARD OF POTENTIALLY USEFUL, BUT NOT CURRENTLY USED CODE ####
+
+# # 6. Make HEF maps (currently not used) --------------------------------------
+# 
+# ## First, reorder the HEF levels
+# scaling_map_sf$accm_hzt_cat <- fct_relevel(scaling_map_sf$accm_hzt_cat, "Q100", after = Inf)
+# 
+# yrb_hef <- ggplot() +
+#   geom_sf(data = scaling_map_sf %>% filter(basin == "yakima"), 
+#           aes(color = accm_hzt_cat), show.legend = F) + 
+#   geom_sf(data = yakima_boundary, fill = NA, color = "black") + 
+#   scale_color_viridis_d() + 
+#   theme_map() + 
+#   labs(color = "HEF quantile") + 
+#   theme(legend.position = c(0.8, 0.7), 
+#         legend.background = element_blank())
+# 
+# wrb_hef <- ggplot() +
+#   geom_sf(data = scaling_map_sf %>% filter(basin == "willamette"), aes(color = accm_hzt_cat)) + 
+#   geom_sf(data = willamette_boundary, fill = NA, color = "black") + 
+#   scale_color_viridis_d() + 
+#   theme_map() + 
+#   labs(color = "HEF quantile")
 
