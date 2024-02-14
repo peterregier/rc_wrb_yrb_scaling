@@ -199,7 +199,7 @@ y_scaling_grob <- plot_yakima +
 y_scaling_grob
 
 
-# 6. Make final plots and 
+# 6. Make final plots and export -----------------------------------------------
 
 plot_grid(w_scaling_grob, y_scaling_grob, nrow = 1)
 ggsave("figures/agu_poster/og_figure2.pdf", width = 24, height = 10)
@@ -211,7 +211,7 @@ ggsave("figures/agu_poster/fig2_insets.pdf",
        width = 12, height = 4)
 
 
-## Alternative of inset plots that are colored by type
+# 7. Alternative of inset plots that are colored by type -----------------------
 regression_estimates %>% 
   clean_names() %>% 
   mutate(quantile = fct_relevel(quantile, "Q100", after = Inf)) %>% 

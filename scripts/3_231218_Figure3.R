@@ -10,7 +10,7 @@
 # 1. Setup ---------------------------------------------------------------------
 
 source("scripts/0_setup.R")
-
+p_load(plotly)
 
 # 2. Read in scaling dataset ---------------------------------------------------
 
@@ -42,16 +42,31 @@ regression_estimates <- regression_estimates_raw %>%
                              slope_ci_2_5 < 1 & slope_ci_97_5 < 1 & r_squared > 0.8 ~ "Sublinear", 
                              slope_ci_2_5 > 1 & slope_ci_97_5 > 1 & r_squared > 0.8 ~ "Super-linear", 
                              TRUE ~ "Uncertain")) %>% 
-  select(basin, quantile, r_squared, slope, contains("slope_ci"), scaling) %>% 
+  select(basin, quantile, r_squared, contains("r_squared_ci"), slope, contains("slope_ci"), scaling) %>% 
   mutate(scaling = fct_relevel(scaling, c("Uncertain", "Sublinear")))
 
-ggplot(regression_estimates, aes(quantile, slope)) + 
+
+p_r2 <-  ggplot(regression_estimates, aes(quantile, r_squared)) + 
+  geom_hline(yintercept = 1, linetype = "dashed") + 
+  geom_hline(yintercept = 0.8, linetype = "dashed") + 
+  geom_errorbar(aes(ymin = r_squared_ci_2_5, ymax = r_squared_ci_97_5), color = "gray", width = 0) + 
+  geom_point(size = 4) + 
+  labs(y = expression(R^2)) +
+  facet_wrap(~basin, ncol = 1) + 
+  scale_color_viridis_d()
+  
+p_slope <- ggplot(regression_estimates, aes(quantile, slope)) + 
   geom_hline(yintercept = 1, linetype = "dashed") + 
   geom_errorbar(aes(ymin = slope_ci_2_5, ymax = slope_ci_97_5), color = "gray", width = 0) + 
   geom_point(size = 4, aes( color = scaling)) + 
   facet_wrap(~basin, ncol = 1) + 
   scale_color_viridis_d()
-ggsave("figures/231221_scaling_by_quantile.png", width = 6, height = 5)
+
+plot_grid(p_r2, p_slope, 
+          labels = c("A", "B"), 
+          rel_widths = c(1, 1.5),
+          nrow = 1)
+ggsave("figures/231221_scaling_by_quantile.png", width = 10, height = 5)
 
 scaling_data_raw <- scaling_analysis_dat %>% 
   dplyr:: select(basin_cat,
@@ -123,15 +138,13 @@ figure3 <- plot_grid(make_scaling_plot("Yakima River (Dry)", "Yakima River (YRB)
 ggsave("figures/231219_Figure3.png", width = 10, height = 5)
 
 
-# 2.4 - read in watershed boundaries -------------------------------------------
-
 # 1. Read in watershed shapefiles ----------------------------------------------
 
 nsi <- read_sf("data/nsi_network_ywrb/nsi_network_ywrb.shp") %>% 
   st_transform(crs = common_crs)
 
 ## There isn't a convenient way to break these apart, so I'll use st_crop
-yakima_flowlines <- st_crop(nsi, xmin = -122, xmax = -119, ymin = 45.9, ymax = 48) %>% 
+yakima_flowlines <- st_crop(nsi, xmin = -122, xmax = -119, ymin = 45.9, ymax = 48)
 willamette_flowlines <- st_crop(nsi, xmin = -124, xmax = -121, ymin = 43, ymax = 46)
 
 ## YRB
@@ -154,16 +167,42 @@ color_mapping <- c("Uncertain" = "#3E1152",
                    "Linear" = "#5FB57F", 
                    "Super-linear" = "#F8E755")
 
+## To label outlets, we need to figure out where they are: 
+
+## Columbia: 24520498
+ggplot() + 
+  geom_sf(data = nsi %>% filter(grepl("^Columbia River", GNIS_NAME))) +
+  geom_sf_text(data = nsi %>% filter(grepl("^Columbia River", GNIS_NAME)), aes(label = COMID))
+
+wrb_outlet <- nsi %>% 
+  filter(COMID == 24520498) %>% 
+  slice(1) %>% 
+  st_point_on_surface()
+
+## Yakima: 23099408
+ggplotly(ggplot() + 
+  geom_sf(data = nsi %>% filter(grepl("Yakima River", GNIS_NAME))) +
+  geom_sf_text(data = nsi %>% filter(grepl("Yakima River", GNIS_NAME)), aes(label = COMID)))
+
+yrb_outlet <- nsi %>% 
+  filter(COMID == 23099408) %>% 
+  slice(1) %>% 
+  st_point_on_surface()
+
+
 yrb_faceted_scaling <- make_scaling_plot("Yakima River (Dry)", "Yakima River (YRB)") + 
   geom_sf(data = yakima_boundary, fill = NA, color = "black") + 
   geom_sf(data = nsi %>% filter(grepl("Yakima River", GNIS_NAME)), color = "blue", lwd = 0.2, alpha = 1) + 
+  geom_sf(data = yrb_outlet, color = "black", size = 2) + 
   theme(legend.position = "none") + 
   scale_color_manual(values = color_mapping) + 
   facet_wrap(~scaling, nrow = 1)
 
 wrb_faceted_scaling <- make_scaling_plot("Willamette River (Wet)", "Willamette River (WRB)") + 
   geom_sf(data = willamette_boundary, fill = NA, color = "black") + 
-  geom_sf(data = nsi %>% filter(grepl("^Willamette River", GNIS_NAME)), color = "blue", lwd = 0.2, alpha = 1) + 
+  geom_sf(data = nsi %>% filter(grepl("^Willamette River", GNIS_NAME)), color = "blue", lwd = 0.2, alpha = 1) +
+  geom_sf(data = nsi %>% filter(grepl("^Columbia River", GNIS_NAME)), color = "blue", lwd = 0.4, alpha = 1) +
+  geom_sf(data = wrb_outlet, color = "black", size = 2) + 
   theme(legend.position = "none") + 
   scale_color_manual(values = color_mapping) + 
   facet_wrap(~scaling, nrow = 1, drop = F)
@@ -173,7 +212,7 @@ plot_grid(yrb_faceted_scaling,
           ncol = 1, 
           rel_heights = c(1, 1), 
           align = "hv")
-ggsave("figures/231221_figure3_faceted.png", width = 8, height = 8)
+ggsave("figures/3_figure3_faceted.png", width = 12, height = 8)
 
 # 3. Read in MI dataset --------------------------------------------------------
 

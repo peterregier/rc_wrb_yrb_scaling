@@ -47,6 +47,10 @@ ggplot(scaling_data_combined, aes(scaling, wshd_max_elevation_m, color = basin))
  # scale_y_log10() + 
   geom_smooth() 
 
+## lm models
+summary(lm(log10(accm_totco2_o2g_day)~log10(wshd_max_elevation_m), 
+           data = scaling_data_combined %>% filter(basin == "willamette")))
+
 p_load(ggConvexHull)
 ggplot(scaling_data_combined, aes(wshd_max_elevation_m, accm_totco2_o2g_day)) + 
   #ggplot(scaling_data_combined, aes(wshd_max_elevation_m, accm_totco2_o2g_day / wshd_area_km2)) + 

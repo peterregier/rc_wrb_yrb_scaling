@@ -61,6 +61,8 @@ plot_resp <- ggplot() +
   geom_sf(data = huc12, fill = "forestgreen", alpha = 0.2) + 
   geom_sf(data = sub_flow, color = "gray50", lwd = 2, alpha = 0.5) + 
   geom_sf(data = sub_flow, aes(color = totco2_o2g_day), lwd = 1) + 
+  geom_sf_text(data = sub_flow, aes(label = round(totco2_o2g_day, 0)), 
+               size = 2.5, fontface = "bold") + 
   scale_color_viridis_c(trans = "log10", option = "D") + 
   theme_map() + 
   labs(title = "Reach-scale respiration", color = "g CO2/d") + 
@@ -71,6 +73,8 @@ plot_accm_resp <- ggplot() +
   geom_sf(data = huc12, fill = "forestgreen", alpha = 0.2) + 
   geom_sf(data = sub_flow, color = "gray50", lwd = 2, alpha = 0.5) + 
   geom_sf(data = sub_flow, aes(color = accm_totco2_o2g_day), lwd = 1) + 
+  geom_sf_text(data = sub_flow, aes(label = round(accm_totco2_o2g_day, 0)), 
+               size = 2.5, fontface = "bold") + 
   scale_color_viridis_c(trans = "log10", option = "D") + 
   theme_map() + 
   labs(title = "Cumulative respiration", color = "g CO2/d") + 
@@ -79,8 +83,10 @@ plot_accm_resp <- ggplot() +
 
 plot_grid(plot_resp, plot_accm_resp, 
           nrow = 1)
-ggsave("figures/proposal/240108_proposal_maps.pdf", 
+ggsave("figures/240202_cumulative_concept_map.png",
        width = 8, height = 4)
+# ggsave("figures/proposal/240108_proposal_maps.pdf", 
+#        width = 8, height = 4)
 
 b = summary(lm(log_resp ~ log_area, data = sub_flow))[[4]][1,1]
 line_width = 1.2
