@@ -71,6 +71,7 @@ ggsave("figures/231221_scaling_by_quantile.png", width = 10, height = 5)
 scaling_data_raw <- scaling_analysis_dat %>% 
   dplyr:: select(basin_cat,
                  basin,
+                 stream_order,
                  comid, 
                  longitude,
                  latitude,
@@ -213,6 +214,7 @@ plot_grid(yrb_faceted_scaling,
           rel_heights = c(1, 1), 
           align = "hv")
 ggsave("figures/3_figure3_faceted.png", width = 12, height = 8)
+
 
 # 3. Read in MI dataset --------------------------------------------------------
 
