@@ -155,7 +155,7 @@ yakima_boundary <- get_huc(AOI = st_union(yakima_flowlines), type = "huc04") %>%
 # WRB - same as before, this doesn't cut it. Commenting out but keeping for now
 # willamette_boundary <- get_huc(AOI = st_union(willamette_flowlines), type = "huc04") %>%
 #   filter(huc4 == "1709")
-willamette_boundary <- read_sf("data/basin_boundaries/Willamette_Custom_Watershed_Boundary/Willamette_Custom_Watershed_Boundary.shp") %>% 
+willamette_boundary <- read_sf("data/basin_boundaries/Willamette_Custom_Watershed_Boundary_noCorner/Willamette_Custom_Watershed_Boundary_noCorner.shp") %>% 
   st_transform(crs = common_crs)
 
 
@@ -202,7 +202,7 @@ yrb_faceted_scaling <- make_scaling_plot("Yakima River (Dry)", "Yakima River (YR
 wrb_faceted_scaling <- make_scaling_plot("Willamette River (Wet)", "Willamette River (WRB)") + 
   geom_sf(data = willamette_boundary, fill = NA, color = "black") + 
   geom_sf(data = nsi %>% filter(grepl("^Willamette River", GNIS_NAME)), color = "blue", lwd = 0.2, alpha = 1) +
-  geom_sf(data = nsi %>% filter(grepl("^Columbia River", GNIS_NAME)), color = "blue", lwd = 0.4, alpha = 1) +
+  #geom_sf(data = nsi %>% filter(grepl("^Columbia River", GNIS_NAME)), color = "blue", lwd = 0.4, alpha = 1) +
   geom_sf(data = wrb_outlet, color = "black", size = 2) + 
   theme(legend.position = "none") + 
   scale_color_manual(values = color_mapping) + 
@@ -214,7 +214,7 @@ plot_grid(yrb_faceted_scaling,
           rel_heights = c(1, 1), 
           align = "hv")
 ggsave("figures/3_figure3_faceted.png", width = 12, height = 8)
-
+ggsave("figures/3_figure3_faceted.pdf", width = 12, height = 8)
 
 # 3. Read in MI dataset --------------------------------------------------------
 

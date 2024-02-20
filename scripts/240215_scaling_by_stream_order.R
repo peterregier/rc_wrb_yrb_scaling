@@ -74,7 +74,6 @@ scaling_data_combined %>%
   #summarize(n = sum(count)) %>% 
   mutate(percent = count / sum(count)) %>% 
   ggplot(aes(stream_order, count, 
-             color = scaling, 
              fill = scaling, 
              group = scaling)) + 
   geom_area(alpha = 0.7) + 

@@ -14,6 +14,7 @@
 # 1. Setup ---------------------------------------------------------------------
 
 source("scripts/0_setup.R")
+p_load(segmented)
 
 
 # 2. Plotting function from Fco ------------------------------------------------
@@ -98,7 +99,7 @@ regression_estimates <- read_csv("data/guerrero_etal_23_results_cross_validation
 
 ## Prep regression data
 reg_estimates_long <- regression_estimates %>% 
-  select(basin,
+  dplyr::select(basin,
          quantile,
          Slope,
          RSquared,
@@ -201,14 +202,25 @@ y_scaling_grob
 
 # 6. Make final plots and export -----------------------------------------------
 
-plot_grid(w_scaling_grob, y_scaling_grob, nrow = 1)
-ggsave("figures/agu_poster/og_figure2.pdf", width = 24, height = 10)
+p_load(grid)
+x.grob <- textGrob(x.grob <- paste0(expression("Watershed area (", "km^2", ")")), 
+                   gp=gpar(fontface="bold", fontsize=15))
+
+grid.arrange(w_scaling_grob, y_scaling_grob, 
+             bottom = x.grob, 
+             nrow = 1)
+ggsave("figures/2_figure2.png", width = 24, height = 12)
+ggsave("figures/2_figure2.pdf", width = 24, height = 12)
+
+# plot_grid(w_scaling_grob, y_scaling_grob, 
+#           bottom = x.grob, 
+#           nrow = 1)
 
 
-plot_grid(willamette_inset_plot, NULL, yakima_inset_plot, 
-          nrow = 1, rel_widths = c(1, 0.1, 1))
-ggsave("figures/agu_poster/fig2_insets.pdf", 
-       width = 12, height = 4)
+# plot_grid(willamette_inset_plot, NULL, yakima_inset_plot, 
+#           nrow = 1, rel_widths = c(1, 0.1, 1))
+# ggsave("figures/agu_poster/fig2_insets.pdf", 
+#        width = 12, height = 4)
 
 
 # 7. Alternative of inset plots that are colored by type -----------------------
@@ -220,7 +232,7 @@ regression_estimates %>%
                              slope_ci_2_5 < 1 & slope_ci_97_5 < 1 & r_squared > 0.8 ~ "Sublinear", 
                              slope_ci_2_5 > 1 & slope_ci_97_5 > 1 & r_squared > 0.8 ~ "Super-linear", 
                              TRUE ~ "Uncertain")) %>% 
-  select(basin, quantile, r_squared, slope, contains("slope_ci"), scaling) %>% 
+  dplyr::select(basin, quantile, r_squared, slope, contains("slope_ci"), scaling) %>% 
   ggplot(aes(x = quantile)) + 
   geom_point(aes(y = slope, color = scaling), size = 4.5) +
   geom_errorbar(aes(ymin = slope_ci_2_5, ymax = slope_ci_97_5), width = 0.2) + 
@@ -229,4 +241,5 @@ regression_estimates %>%
   scale_y_continuous(limits = c(0.35, 1.7), breaks = c(0.5, 0.75, 1.0, 1.25, 1.50)) +
   scale_x_discrete(labels = c("10", "20", "30", "40", "50", "60", "70", "80", "90", "100")) + 
   scale_color_manual(values = c("gray", "blue", "forestgreen", "red"))
+ggsave("figures/s_scaling_by_hef_quantiles.png", width = 8, height = 3)
 
