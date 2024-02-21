@@ -83,7 +83,29 @@ ggsave("figures/5_Figure5.pdf", width = 8, height = 4)
 
 # Make supplemental figure -----------------------------------------------------
 
-ggplot(scaling_data_combined, aes(wshd_area_km2, wshd_max_elevation_m)) + 
-  geom_point() + 
+calc_lm <- function(selected_basin){
+  x <- scaling_data_raw %>% 
+    filter(basin == selected_basin)
+  
+  model <- summary(lm(log10(wshd_max_elevation_m)~log10(wshd_area_km2), 
+               data = x))
+  
+  model[[9]]
+}
+
+calc_lm("willamette")
+calc_lm("yakima")
+
+ggplot(scaling_data_raw, aes(wshd_area_km2, wshd_max_elevation_m, color = basin)) + 
+  geom_point(alpha = 0.4) + 
+  geom_smooth(method = "lm", aes(group = basin), color = "black") + 
   scale_x_log10() + 
   scale_y_log10()
+ggsave("figures/s_elevation_v_area.png", width = 5, height = 4)
+ggsave("figures/s_elevation_v_area.pdf", width = 5, height = 4)
+
+## What about velocity?
+ggplot(scaling_data_raw, aes(stream_order, mean_ann_vel_ms, color = basin)) + 
+  geom_point(alpha = 0.4) + 
+  facet_wrap(~basin, ncol = 1)
+
