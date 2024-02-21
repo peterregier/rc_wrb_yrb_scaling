@@ -25,7 +25,7 @@ regression_estimates <- regression_estimates_raw %>%
                              slope_ci_2_5 < 1 & slope_ci_97_5 < 1 & r_squared > 0.8 ~ "Sublinear", 
                              slope_ci_2_5 > 1 & slope_ci_97_5 > 1 & r_squared > 0.8 ~ "Super-linear", 
                              TRUE ~ "Uncertain")) %>% 
-  select(basin, quantile, r_squared, slope, contains("slope_ci"), scaling) %>% 
+  dplyr::select(basin, quantile, r_squared, slope, contains("slope_ci"), scaling) %>% 
   mutate(scaling = fct_relevel(scaling, c("Uncertain", "Sublinear")))
 
 scaling_data_raw <- scaling_analysis_dat %>% 
@@ -56,6 +56,10 @@ calc_r2 <- function(which_basin){
   paste0("R2: ", round(r2, 2))
 }
 
+calc_r2("willamette")
+calc_r2("yakima")
+
+
 p_load(ggConvexHull)
 ggplot(scaling_data_combined, aes(wshd_max_elevation_m, accm_totco2_o2g_day)) + 
   #ggplot(scaling_data_combined, aes(wshd_max_elevation_m, accm_totco2_o2g_day / wshd_area_km2)) + 
@@ -68,11 +72,18 @@ ggplot(scaling_data_combined, aes(wshd_max_elevation_m, accm_totco2_o2g_day)) +
   facet_wrap(~basin, nrow = 1) + 
   scale_color_viridis_d() +
   scale_fill_viridis_d() +
-  ggpubr::stat_cor(aes(label = after_stat(rr.label)), geom = "label") + 
+  #ggpubr::stat_cor(aes(label = after_stat(rr.label)), geom = "label") + 
   labs(x = "Maximum watershed elevation (m)", 
        y = "Cumulative respiration (gCO2/day/m2)", 
        color = "Scaling", 
        fill = "Scaling")
-ggsave("figures/4_Figure4.png", width = 8, height = 4)
-ggsave("figures/4_Figure4.pdf", width = 8, height = 4)
+ggsave("figures/5_Figure5.png", width = 8, height = 4)
+ggsave("figures/5_Figure5.pdf", width = 8, height = 4)
 
+
+# Make supplemental figure -----------------------------------------------------
+
+ggplot(scaling_data_combined, aes(wshd_area_km2, wshd_max_elevation_m)) + 
+  geom_point() + 
+  scale_x_log10() + 
+  scale_y_log10()
