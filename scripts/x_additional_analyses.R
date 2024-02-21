@@ -46,10 +46,9 @@ ggplot(medians, aes(x = median_wshd_area_km2,
               method = "lm", se = T, color = small_watershed_color) +
   geom_smooth(data = medians %>% filter(median_wshd_area_km2 > 10), 
               method = "lm", se = T, , color = big_watershed_color) +
-  #geom_hline(yintercept = breakpoint) + 
   geom_point(aes(shape = basin_cat), size = 3, alpha = 0.7) + 
-  annotate(geom = "text", x = 10, y = 4e8, label = paste0("< 10 km2: ", lm_stats(lm_small))) + 
-  annotate(geom = "text", x = 10, y = 1e8, label = paste0("> 10 km2: ", lm_stats(lm_large))) + 
+  annotate(geom = "text", x = 10, y = 4e8, label = lm_stats(lm_small), color = small_watershed_color) + 
+  annotate(geom = "text", x = 10, y = 1e8, label = lm_stats(lm_large), color = big_watershed_color) + 
   #ggpubr::stat_cor(aes(label = after_stat(rr.label)), geom = "label") + 
   #stat_poly_eq(data = medians %>% filter(median_wshd_area_km2 < 10), 
   #             color = small_watershed_color) + 
@@ -62,6 +61,7 @@ ggplot(medians, aes(x = median_wshd_area_km2,
   scale_x_log10() +  
   scale_y_log10()
 ggsave("figures/x_fig2_by_medians.png", width = 6, height = 4)
+
 
 p_load(ggpmisc, #stat_poly_eq
        car) #vif
