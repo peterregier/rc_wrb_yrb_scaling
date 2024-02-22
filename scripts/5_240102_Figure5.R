@@ -105,7 +105,17 @@ ggsave("figures/s_elevation_v_area.png", width = 5, height = 4)
 ggsave("figures/s_elevation_v_area.pdf", width = 5, height = 4)
 
 ## What about velocity?
-ggplot(scaling_data_raw, aes(stream_order, mean_ann_vel_ms, color = basin)) + 
+ggplot(scaling_analysis_dat, aes(stream_order, mean_ann_vel_ms, color = basin)) + 
   geom_point(alpha = 0.4) + 
   facet_wrap(~basin, ncol = 1)
+
+## How do watershed area and HEF correlate? 
+scaling_analysis_dat %>% 
+  mutate(accm_hzt_cat = fct_relevel(accm_hzt_cat, "Q100", after = Inf)) %>% 
+  ggplot(aes(accm_hzt_cat, wshd_area_km2)) + 
+  geom_boxplot() + 
+  facet_wrap(~basin, ncol = 1) + 
+  scale_y_log10()
+
+
 

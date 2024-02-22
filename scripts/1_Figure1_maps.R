@@ -27,7 +27,7 @@ yakima_boundary <- get_huc(AOI = st_union(yakima_flowlines), type = "huc04") %>%
   filter(huc4 == "1703")
 
 ## WRB
-willamette_boundary <- read_sf("data/basin_boundaries/Willamette_Custom_Watershed_Boundary/Willamette_Custom_Watershed_Boundary.shp") %>% 
+willamette_boundary <- read_sf("data/basin_boundaries/Willamette_Custom_Watershed_Boundary_noCorner/Willamette_Custom_Watershed_Boundary_noCorner.shp") %>% 
   st_transform(crs = common_crs)
 
 
