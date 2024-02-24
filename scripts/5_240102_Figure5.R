@@ -117,5 +117,15 @@ scaling_analysis_dat %>%
   facet_wrap(~basin, ncol = 1) + 
   scale_y_log10()
 
+## What about precip and cumulative respiration? 
+ggplot(scaling_analysis_dat, aes(mean_ann_pcpt_mm, accm_totco2_o2g_day, color = basin)) + 
+  geom_point(alpha = 0.4) + 
+  ggpubr::stat_cor(aes(label = after_stat(rr.label)), geom = "label") 
 
+ggplot(scaling_analysis_dat, aes(mean_ann_pcpt_m3, accm_totco2_o2g_day, color = basin)) + 
+  geom_point(alpha = 0.4) + 
+  ggpubr::stat_cor(aes(label = after_stat(rr.label)), geom = "label") 
 
+ggplot(scaling_analysis_dat, aes(mean_ann_pcpt_m3, mean_ann_pcpt_mm, color = basin)) + 
+  geom_point(alpha = 0.4) + 
+  ggpubr::stat_cor(aes(label = after_stat(rr.label)), geom = "label") 
