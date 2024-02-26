@@ -129,3 +129,27 @@ ggplot(scaling_analysis_dat, aes(mean_ann_pcpt_m3, accm_totco2_o2g_day, color = 
 ggplot(scaling_analysis_dat, aes(mean_ann_pcpt_m3, mean_ann_pcpt_mm, color = basin)) + 
   geom_point(alpha = 0.4) + 
   ggpubr::stat_cor(aes(label = after_stat(rr.label)), geom = "label") 
+
+
+## WW point is good: HEF, stream order and max elevation are likely all similar...
+## Let's examine here:
+
+p_order_hef <- scaling_analysis_dat %>% 
+  mutate(accm_hzt_cat = fct_relevel(accm_hzt_cat, "Q100", after = Inf)) %>% 
+  ggplot(aes(accm_hzt_cat, stream_order, color = basin)) + 
+  geom_boxplot(alpha = 0.4) 
+
+p_hef_elev <- scaling_analysis_dat %>% 
+  mutate(accm_hzt_cat = fct_relevel(accm_hzt_cat, "Q100", after = Inf)) %>% 
+  ggplot(aes(accm_hzt_cat, wshd_max_elevation_m, color = basin)) + 
+  geom_boxplot(alpha = 0.4) 
+
+p_order_elev <- scaling_analysis_dat %>% 
+  ggplot(aes(as.factor(stream_order), wshd_max_elevation_m, color = basin)) + 
+  geom_boxplot(alpha = 0.4) 
+
+plot_grid(p_order_hef, p_hef_elev, p_order_elev, 
+          ncol = 1)
+ggsave("figures/240224_comparison_hef_stream_order_elevation.png", 
+       width = 7, height = 11)
+
