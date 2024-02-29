@@ -153,3 +153,51 @@ plot_grid(p_order_hef, p_hef_elev, p_order_elev,
 ggsave("figures/240224_comparison_hef_stream_order_elevation.png", 
        width = 7, height = 11)
 
+make_boxplot <- function(var){
+  ggplot(scaling_data_combined, aes(basin, {{var}}, fill = scaling)) + 
+    geom_boxplot()
+}
+
+make_boxplot(wshd_max_elevation_m)
+
+
+p_load(infotheo)
+
+scaling_data_mi <- scaling_data_combined %>% 
+  select(basin, scaling, d50_cat, rnf_cat, mean_ann_pcpt_mm, wshd_max_elevation_m) %>% 
+  mutate()
+
+
+## Try out geographically weighted random forest
+p_load(SpatialML)
+
+rf_data <- scaling_data_combined %>% 
+  select(stream_order, doc_stream_mg_l, no3_stream_mg_l, 
+         do_stream_mg_l, stream_area_m2, stream_width_m, reach_slope, d50_m) 
+
+coordinates <- scaling_data_combined %>% 
+  select(latitude, longitude) 
+
+grf_model <- grf(scaling ~ basin + doc_stream_mg_l + no3_stream_mg_l + do_stream_mg_l, 
+                 dframe = rf_data, 
+                 bw = 60, 
+                 kernel = "adaptive",
+                 coords = coordinates)
+
+data(Income)
+Coords<-Income[ ,1:2]
+grf <- grf(Income01 ~ UnemrT01 + PrSect01, dframe=Income, bw=60,
+           kernel="adaptive", coords=Coords)
+
+
+
+
+
+
+
+
+
+
+
+
+
