@@ -45,7 +45,7 @@ scaling_data_combined <- inner_join(scaling_data_raw,
 predictors_new <- c("forest_3scp",
                     "shrub_3scp",
                     "human_3scp",
-                    "stream_order",
+                    #"stream_order",
                     "wshd_max_elevation_m",
                     #"simpson_d3",
                     "mean_ann_pcpt_mm")
@@ -103,12 +103,11 @@ calculate_mi <- function(selected_basin, selected_quantile){
 mi_outputs <- mi_to_run %>% 
   pmap(calculate_mi) %>% 
   bind_rows() %>% 
-  mutate(vars = case_when(vars == "accm_doc_load_kg_d" ~ "C. DOC load", 
-                          vars == "accm_no3_load_kg_d" ~ "C. NO3 load", 
-                          vars == "accm_water_exchng_kg_d" ~ "C. water exchange", 
-                          vars == "accm_wshd_stream_dens" ~ "C. stream density", 
-                          vars == "accm_reach_length_km" ~ "C. reach length", 
-                          vars == "accm_mean_ann_pcpt_mm" ~ "C. annual precip.", 
+  mutate(vars = case_when(vars == "forest_3scp" ~ "% Forest", 
+                          vars == "shrub_3scp" ~ "% Schrubland", 
+                          vars == "human_3scp" ~ "% Human-influenced", 
+                          vars == "wshd_max_elevation_m" ~ "Max. elevation", 
+                          vars == "mean_ann_pcpt_mm" ~ "Mean annual precip", 
                           TRUE ~ vars))
 
 mi_vars <- unique(mi_outputs$vars)
@@ -127,4 +126,5 @@ mi_outputs %>%
        y = "Cumulative watershed variable") + 
   scale_color_manual(values = mi_colors$colors) + 
   scale_fill_manual(values = mi_colors$colors)
-ggsave("figures/s_240229_mutual_info_by_basin_and_quantile.png", width = 8, height = 6)
+ggsave("figures/4_240229_mutual_info_by_basin_and_quantile.png", width = 8, height = 6)
+ggsave("figures/4_240229_mutual_info_by_basin_and_quantile.pdf", width = 8, height = 6)

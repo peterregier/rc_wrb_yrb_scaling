@@ -63,23 +63,24 @@ calc_r2("yakima")
 p_load(ggConvexHull)
 ggplot(scaling_data_combined, aes(wshd_max_elevation_m, accm_totco2_o2g_day)) + 
   #ggplot(scaling_data_combined, aes(wshd_max_elevation_m, accm_totco2_o2g_day / wshd_area_km2)) + 
-  geom_point(aes(color = scaling)) + 
+  geom_point(aes(color = scaling, size = mean_ann_pcpt_mm), alpha = 0.5) + 
   geom_convexhull(aes(group = scaling, color = scaling, 
                       fill = scaling), alpha = 0.2) +
   #scale_x_log10() + 
   scale_y_log10() + 
   geom_smooth(method = "lm", color = "black")  + 
   facet_wrap(~basin, nrow = 1) + 
+  scale_size_continuous(range = c(0.1, 3)) +
   scale_color_viridis_d() +
   scale_fill_viridis_d() +
   #ggpubr::stat_cor(aes(label = after_stat(rr.label)), geom = "label") + 
   labs(x = "Maximum watershed elevation (m)", 
-       y = "Cumulative respiration (gCO2/day/m2)", 
+       y = "Cumulative respiration (gCO2/day)",
+       size = "Mean precip (mm/yr)",
        color = "Scaling", 
        fill = "Scaling")
-ggsave("figures/5_Figure5.png", width = 8, height = 4)
-ggsave("figures/5_Figure5.pdf", width = 8, height = 4)
-
+ggsave("figures/5_Figure5.png", width = 10, height = 5)
+ggsave("figures/5_Figure5.pdf", width = 10, height = 5)
 
 # Make supplemental figure -----------------------------------------------------
 
