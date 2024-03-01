@@ -1,6 +1,13 @@
-## Random Forest v3
-## Based on Wil's feedback, let's try and model cumulative respiration, but
-## divided by 1) scaling x basin, and 2) median HEF x basin
+## Yet another iteration...
+## Let's create 4 models to test is it basin or scaling that results in more
+## different fits/feature importance. We'll use a subset of data that includes
+## Q10-30 and Q80-100 for both watersheds (the areas that behave similarly)
+## 1. YRB (all quantiles)
+## 2. WRB (all quantiles)
+## 3. Q10-30 (both basins)
+## 4. Q80-100 (both basins)
+## Assess 1) GOF (NSE), which models performed the best? and 2) how similar
+## was the order of importance of variables?
 
 # 1. Setup ---------------------------------------------------------------------
 
@@ -12,7 +19,6 @@ p_load(RandomForestsGLS, #not using (doesn't easily give VI)
        PNWColors,
        tidymodels,
        tictoc)
-
 
 # 2. Read in scaling dataset ---------------------------------------------------
 
@@ -37,50 +43,36 @@ scaling_data_raw <- scaling_analysis_dat %>%
 
 scaling_data_combined <- inner_join(scaling_data_raw, 
                                     regression_estimates, 
-                                    by = c("basin", "quantile"))
+                                    by = c("basin", "quantile")) %>% 
+  filter(quantile_n < 40 | quantile_n > 70) %>% 
+  mutate(quantile_cat = case_when(quantile_n < 40 ~ "Q10-30", 
+                                  quantile_n > 70 ~ "Q80-100", 
+                                  TRUE ~ NA))
 
+predictors_new <- c(#"forest_3scp", "shrub_3scp", "human_3scp", 
+                    "accm_doc_load_kg_d", 
+                    "accm_no3_load_kg_d", 
+                    "accm_water_exchng_kg_d", 
+                    "accm_wshd_stream_dens",
+                    "accm_reach_length_km", 
+                    "accm_mean_ann_pcpt_mm") 
 
-# 3. Prep dataset --------------------------------------------------------------
-
-## Predictor columns to keep
-predictors = c("doc_stream_mg_l", "no3_stream_mg_l", "do_stream_mg_l", 
-               "forest_3scp",  # removed: correlation filter for YRB
-               "shrub_3scp", "human_3scp", #swapping out for something easier to explain
-               #"wshd_max_elevation_m", 
-               #"simpson_d", 
-               #"mean_ann_pcpt_mm", 
-               "d50_m")
-
-predictors_new <- c(#"doc_stream_mg_l", "no3_stream_mg_l", "do_stream_mg_l", 
-                                 "forest_3scp", "shrub_3scp", "human_3scp", 
-                                 "doc_load_kg_d", "no3_load_kg_d", "water_exchng_kg_d", 
-                                 "wshd_max_elevation_m", 
-                                 #"simpson_d", 
-                                 "mean_ann_pcpt_mm")
-
-## Dataset for feeding to the model
-df_rf_all <- scaling_data_combined %>% 
-  mutate(hef_cat = ifelse(quantile_n > 50, "high_hef", "low_hef")) %>%
-  mutate(scaling_cat = case_when(scaling == "Super-linear" ~ "superlinear", 
-                                 scaling == "Uncertain" ~ "uncertain", 
-                                 TRUE ~ "sub_or_linear")) %>% 
-  dplyr::select(basin, scaling, # Metadata
-                hef_cat, scaling_cat, # Categories
+df <- scaling_data_combined %>% 
+  filter(!is.na(quantile_cat))  %>% 
+  dplyr::select(basin, quantile_cat, # Categories
                 accm_totco2_o2g_day, # Dependent (allometric scaling slope)
                 all_of(predictors_new), # Predictors
-                latitude, longitude) # Coordinates
+                latitude, longitude) #%>% # Coordinates
+  #group_by(basin, quantile_cat) %>% 
+  #slice(1:500) %>% 
+  #ungroup()
 
 
-# 4. Make a flexible RF function -----------------------------------------------
-
-## Two inputs: basin and category - that can be set up via a dataframe then
-## fed to the function
-
-models_to_run <- tibble(expand_grid(selected_basin = unique(df_rf_all$basin), 
-                                    cat = unique(df_rf_all$scaling_cat)))
+models_to_run <- tibble(expand_grid(selected_basin = unique(df$basin), 
+                                    cat = unique(df$quantile_cat)))
 
 prep_grf_model <- function(selected_basin = selected_basin, 
-                          cat = cat){
+                           cat = cat){
   
   message(paste("Running", selected_basin, "for", cat))
   
@@ -89,38 +81,84 @@ prep_grf_model <- function(selected_basin = selected_basin,
   proportion = 3/4
   coord_cols = c("longitude", "latitude")
   
-  x <- df_rf_all %>% 
-    filter(scaling_cat == cat) %>% 
+  x <- df %>% 
+    filter(quantile_cat == cat) %>% 
     filter(basin == selected_basin)
   
   model_data_raw <- x %>%
     dplyr::select(accm_totco2_o2g_day, all_of(predictors_new))
-
+  
   model_coordinates <- x %>%
     dplyr::select(latitude, longitude)
-
+  
   model_recipe <- model_data_raw %>%
     recipe(accm_totco2_o2g_day ~ .) %>%
     #step_corr(all_predictors()) %>%
     step_normalize(all_predictors(), -all_outcomes()) %>%
     recipes::prep()
-
- model_data <- model_recipe %>%
-  bake(model_data_raw)
-
- return(list(model_data = model_data, 
-             model_coordinates = model_coordinates))
-
+  
+  model_data <- model_recipe %>%
+    bake(model_data_raw)
+  
+  return(list(model_data = model_data, 
+              model_coordinates = model_coordinates, 
+              model_recipe = model_recipe))
+  
 }
 
 data_for_modeling <- models_to_run %>% 
   pmap(prep_grf_model) 
 
 
+run_rf_model <- function(x2){
+
+  predictors_used <- colnames(x2 %>% select(-accm_totco2_o2g_day))
+
+  ## Set formula
+  f <- as.formula(paste("accm_totco2_o2g_day ~", paste(predictors_used, collapse = " + ")))
+
+  tic("run model")
+  rf_model <- ranger(formula = f,
+                              data = x2,
+                              importance="impurity")
+
+ # return(rf_model)
+  
+  vi <- as.data.frame(rf_model$variable.importance) %>%
+    rownames_to_column() %>%
+    clean_names() %>%
+    rename("predictor" = 1,
+           "fi_raw" = 2) %>%
+    as_tibble() %>%
+    mutate(fi_n = fi_raw / sum(fi_raw) * 100)
+  toc()
+
+  return(vi)
+}
+
+outputs <- list()
+for(i in 1:nrow(models_to_run)){
+  outputs[[i]] <- run_rf_model(data_for_modeling[[i]]$model_data) %>% 
+    mutate(basin = models_to_run$selected_basin[i], 
+           cat = models_to_run$cat[i])
+}
+
+bind_rows(outputs) %>% 
+  ggplot(aes(fi_n, predictor, fill = predictor)) + 
+  geom_col() + 
+  facet_wrap(basin ~ cat)
+
+
+scaling_data_combined %>% 
+  dplyr::select(accm_totco2_o2g_day, all_of(predictors_new)) %>% 
+  cor()
+
 ## This is a stupid way to do this, but I don't know how else to get grf() to loop. 
 ## It absolutely refuses to play nicely with pmap() for some reason...
 vi_list <- list()
-for(i in 1:6){
+
+tic("run for-loop")
+for(i in 3:3){
   
   ## Pull predictors to include
   predictors_used <- colnames(data_for_modeling[[i]]$model_data %>% select(-accm_totco2_o2g_day))
@@ -131,9 +169,9 @@ for(i in 1:6){
   grf_model <- SpatialML::grf(formula = f,
                               dframe = data_for_modeling[[i]]$model_data,
                               importance="impurity",
-                              bw = 60,
+                              bw = 20,
                               kernel = "adaptive",
-                              nthreads = 12,
+                              nthreads = 8,
                               coords = data_for_modeling[[i]]$model_coordinates)
   
   vi_list[[i]] <- as.data.frame(grf_model$Global.Model$variable.importance) %>%
@@ -145,12 +183,14 @@ for(i in 1:6){
     mutate(fi_n = fi_raw / sum(fi_raw) * 100, 
            basin = models_to_run$selected_basin[[i]], 
            cat = models_to_run$cat[[i]])
+  
+  rm(grf_model)
 }
 
-vi <- bind_rows(vi_list) 
-write_csv(vi, "data/240228_vi_by_basin_and_scaling_category2.csv")
+toc()
 
-vi %>% 
+
+bind_rows(vi_list) %>% 
   ggplot(aes(fi_n, predictor, fill = predictor)) + 
   geom_col(width = 0.7, alpha = 0.7) + 
   facet_wrap(basin~cat, nrow = 2)
@@ -158,32 +198,3 @@ vi %>%
 
 
 
-# run_grf_model <- function(x2, coordinates){
-#   
-#   predictors_used <- colnames(x2 %>% select(-accm_totco2_o2g_day))
-#   
-#   ## Set formula
-#   f <- as.formula(paste("accm_totco2_o2g_day ~", paste(predictors_used, collapse = " + ")))
-#   
-#   tic("run model")
-#   grf_model <- SpatialML::grf(formula = f,
-#                               dframe = x2,
-#                               importance="impurity",
-#                               bw = 10,
-#                               kernel = "adaptive",
-#                               #nthreads = 4,
-#                               coords = model_coordinates)
-#   
-#   # vi <- as.data.frame(grf_model$Global.Model$variable.importance) %>%
-#   #   rownames_to_column() %>%
-#   #   clean_names() %>%
-#   #   rename("predictor" = 1,
-#   #          "fi_raw" = 2) %>%
-#   #   as_tibble() %>%
-#   #   mutate(fi_n = fi_raw / sum(fi_raw) * 100,
-#   #          basin = basin,
-#   #          scaling = cat)
-#   # toc()
-#   # 
-#   return(vi)
-# }
