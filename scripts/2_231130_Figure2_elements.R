@@ -75,7 +75,7 @@ create_faceted_plots <- function(data, selected_basin) {
           legend.text = element_text(size = 16),
           axis.text = element_text(size = 30),
           strip.text = element_text(size = 24, face = "bold", hjust = 0),
-          plot.margin = margin(0, 0, 0, 0, "cm"),
+          #plot.margin = margin(0, 0, 0, 0, "cm"),
           plot.title.position = "plot") 
   
   # Conditional formatting for yakima basin
@@ -149,7 +149,7 @@ create_full_plots <- function(data, selected_basin) {
           legend.text = element_text(size = 16),
           axis.text = element_text(size = 32),
           strip.text = element_text(size = 24, face = "bold", hjust = 0),
-          plot.margin = margin(0, 0, 0, 0, "cm"),
+          #plot.margin = margin(0, 0, 0, 0, "cm"),
           plot.title.position = "plot") 
   
   # Conditional formatting for yakima basin
@@ -236,7 +236,7 @@ reg_inset_plot <- function(selected_basin) {
           axis.text = element_text(size = 14),
           axis.title = element_text(size = 14),
           panel.grid.major = element_line(colour = "gray", linetype = "dotted"),
-          plot.margin = margin(0, 0, 0, 0, "cm"),
+          #plot.margin = margin(0, 0, 0, 0, "cm"),
           plot.title = element_text(size = 16, face ="bold"),
           plot.background = element_blank())
   

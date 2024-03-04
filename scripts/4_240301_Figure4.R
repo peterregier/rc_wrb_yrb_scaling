@@ -108,7 +108,11 @@ mi_outputs <- mi_to_run %>%
                           vars == "human_3scp" ~ "% Human-influenced", 
                           vars == "wshd_max_elevation_m" ~ "Max. elevation", 
                           vars == "mean_ann_pcpt_mm" ~ "Mean annual precip", 
-                          TRUE ~ vars))
+                          TRUE ~ vars)) %>% 
+  mutate(basin = case_when(basin == "yakima" ~ "Yakima", 
+                           basin == "willamette" ~ "Willamette")) %>% 
+  mutate(quantile_cat = case_when(quantile_cat == "Q10-30" ~ "Q10-30 (Uncertain)",
+                                  quantile_cat == "Q80-100" ~ "Q80-100 (Uncertain)"))
 
 mi_vars <- unique(mi_outputs$vars)
 mi_palette <- PNWColors::pnw_palette("Bay", n = length(mi_vars))
@@ -122,9 +126,9 @@ mi_outputs %>%
   ggplot(aes(mi_n, reorder(vars, mi_n), color = vars, fill = vars)) + 
   geom_col(alpha = 0.7, width = 0.7, show.legend = F) + 
   facet_wrap(basin~quantile_cat) + 
-  labs(x = "Normalized Mutual information (0-1)", 
+  labs(x = "Normalized Mutual information", 
        y = "Cumulative watershed variable") + 
   scale_color_manual(values = mi_colors$colors) + 
   scale_fill_manual(values = mi_colors$colors)
-ggsave("figures/4_240229_mutual_info_by_basin_and_quantile.png", width = 8, height = 6)
-ggsave("figures/4_240229_mutual_info_by_basin_and_quantile.pdf", width = 8, height = 6)
+ggsave("figures/4_Figure4.png", width = 8, height = 6)
+ggsave("figures/4_Figure4.pdf", width = 8, height = 6)

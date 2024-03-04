@@ -42,11 +42,6 @@ scaling_sf <- st_as_sf(scaling_data_combined,
 
 # 3. Start experimenting with plots --------------------------------------------
 
-ggplot(scaling_data_combined, aes(scaling, wshd_max_elevation_m, color = basin)) + 
-  geom_boxplot() + 
- # scale_y_log10() + 
-  geom_smooth() 
-
 ## lm models - doing this way so R2 values are calculated consistently across 
 ## analyses
 calc_r2 <- function(which_basin){
@@ -61,7 +56,10 @@ calc_r2("yakima")
 
 
 p_load(ggConvexHull)
-ggplot(scaling_data_combined, aes(wshd_max_elevation_m, accm_totco2_o2g_day)) + 
+scaling_data_combined %>% 
+  mutate(basin = case_when(basin == "yakima" ~ "Yakima (YRB)", 
+                           basin == "willamette" ~ "Willamette (WRB)",)) %>% 
+  ggplot(aes(wshd_max_elevation_m, accm_totco2_o2g_day)) + 
   #ggplot(scaling_data_combined, aes(wshd_max_elevation_m, accm_totco2_o2g_day / wshd_area_km2)) + 
   geom_point(aes(color = scaling, size = mean_ann_pcpt_mm), alpha = 0.5) + 
   geom_convexhull(aes(group = scaling, color = scaling, 
@@ -104,101 +102,3 @@ ggplot(scaling_data_raw, aes(wshd_area_km2, wshd_max_elevation_m, color = basin)
   scale_y_log10()
 ggsave("figures/s_elevation_v_area.png", width = 5, height = 4)
 ggsave("figures/s_elevation_v_area.pdf", width = 5, height = 4)
-
-## What about velocity?
-ggplot(scaling_analysis_dat, aes(stream_order, mean_ann_vel_ms, color = basin)) + 
-  geom_point(alpha = 0.4) + 
-  facet_wrap(~basin, ncol = 1)
-
-## How do watershed area and HEF correlate? 
-scaling_analysis_dat %>% 
-  mutate(accm_hzt_cat = fct_relevel(accm_hzt_cat, "Q100", after = Inf)) %>% 
-  ggplot(aes(accm_hzt_cat, wshd_area_km2)) + 
-  geom_boxplot() + 
-  facet_wrap(~basin, ncol = 1) + 
-  scale_y_log10()
-
-## What about precip and cumulative respiration? 
-ggplot(scaling_analysis_dat, aes(mean_ann_pcpt_mm, accm_totco2_o2g_day, color = basin)) + 
-  geom_point(alpha = 0.4) + 
-  ggpubr::stat_cor(aes(label = after_stat(rr.label)), geom = "label") 
-
-ggplot(scaling_analysis_dat, aes(mean_ann_pcpt_m3, accm_totco2_o2g_day, color = basin)) + 
-  geom_point(alpha = 0.4) + 
-  ggpubr::stat_cor(aes(label = after_stat(rr.label)), geom = "label") 
-
-ggplot(scaling_analysis_dat, aes(mean_ann_pcpt_m3, mean_ann_pcpt_mm, color = basin)) + 
-  geom_point(alpha = 0.4) + 
-  ggpubr::stat_cor(aes(label = after_stat(rr.label)), geom = "label") 
-
-
-## WW point is good: HEF, stream order and max elevation are likely all similar...
-## Let's examine here:
-
-p_order_hef <- scaling_analysis_dat %>% 
-  mutate(accm_hzt_cat = fct_relevel(accm_hzt_cat, "Q100", after = Inf)) %>% 
-  ggplot(aes(accm_hzt_cat, stream_order, color = basin)) + 
-  geom_boxplot(alpha = 0.4) 
-
-p_hef_elev <- scaling_analysis_dat %>% 
-  mutate(accm_hzt_cat = fct_relevel(accm_hzt_cat, "Q100", after = Inf)) %>% 
-  ggplot(aes(accm_hzt_cat, wshd_max_elevation_m, color = basin)) + 
-  geom_boxplot(alpha = 0.4) 
-
-p_order_elev <- scaling_analysis_dat %>% 
-  ggplot(aes(as.factor(stream_order), wshd_max_elevation_m, color = basin)) + 
-  geom_boxplot(alpha = 0.4) 
-
-plot_grid(p_order_hef, p_hef_elev, p_order_elev, 
-          ncol = 1)
-ggsave("figures/240224_comparison_hef_stream_order_elevation.png", 
-       width = 7, height = 11)
-
-make_boxplot <- function(var){
-  ggplot(scaling_data_combined, aes(basin, {{var}}, fill = scaling)) + 
-    geom_boxplot()
-}
-
-make_boxplot(wshd_max_elevation_m)
-
-
-p_load(infotheo)
-
-scaling_data_mi <- scaling_data_combined %>% 
-  select(basin, scaling, d50_cat, rnf_cat, mean_ann_pcpt_mm, wshd_max_elevation_m) %>% 
-  mutate()
-
-
-## Try out geographically weighted random forest
-p_load(SpatialML)
-
-rf_data <- scaling_data_combined %>% 
-  select(stream_order, doc_stream_mg_l, no3_stream_mg_l, 
-         do_stream_mg_l, stream_area_m2, stream_width_m, reach_slope, d50_m) 
-
-coordinates <- scaling_data_combined %>% 
-  select(latitude, longitude) 
-
-grf_model <- grf(scaling ~ basin + doc_stream_mg_l + no3_stream_mg_l + do_stream_mg_l, 
-                 dframe = rf_data, 
-                 bw = 60, 
-                 kernel = "adaptive",
-                 coords = coordinates)
-
-data(Income)
-Coords<-Income[ ,1:2]
-grf <- grf(Income01 ~ UnemrT01 + PrSect01, dframe=Income, bw=60,
-           kernel="adaptive", coords=Coords)
-
-
-
-
-
-
-
-
-
-
-
-
-

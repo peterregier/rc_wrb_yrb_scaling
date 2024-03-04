@@ -42,7 +42,7 @@ regression_estimates <- regression_estimates_raw %>%
                              slope_ci_2_5 < 1 & slope_ci_97_5 < 1 & r_squared > 0.8 ~ "Sublinear", 
                              slope_ci_2_5 > 1 & slope_ci_97_5 > 1 & r_squared > 0.8 ~ "Super-linear", 
                              TRUE ~ "Uncertain")) %>% 
-  select(basin, quantile, r_squared, contains("r_squared_ci"), slope, contains("slope_ci"), scaling) %>% 
+  select(basin, quantile, r_squared, contains("r_squared_ci"), slope, contains("slope_ci"), intercept, contains("intercept_ci"), scaling) %>% 
   mutate(scaling = fct_relevel(scaling, c("Uncertain", "Sublinear")))
 
 
@@ -54,7 +54,14 @@ p_r2 <-  ggplot(regression_estimates, aes(quantile, r_squared)) +
   labs(y = expression(R^2)) +
   facet_wrap(~basin, ncol = 1) + 
   scale_color_viridis_d()
-  
+
+p_int <- ggplot(regression_estimates, aes(quantile, intercept)) + 
+  geom_hline(yintercept = 1, linetype = "dashed") + 
+  geom_errorbar(aes(ymin = intercept_ci_2_5, ymax = intercept_ci_97_5), color = "gray", width = 0) + 
+  geom_point(size = 4) + 
+  facet_wrap(~basin, ncol = 1) + 
+  scale_color_viridis_d()
+
 p_slope <- ggplot(regression_estimates, aes(quantile, slope)) + 
   geom_hline(yintercept = 1, linetype = "dashed") + 
   geom_errorbar(aes(ymin = slope_ci_2_5, ymax = slope_ci_97_5), color = "gray", width = 0) + 
@@ -62,11 +69,11 @@ p_slope <- ggplot(regression_estimates, aes(quantile, slope)) +
   facet_wrap(~basin, ncol = 1) + 
   scale_color_viridis_d()
 
-plot_grid(p_r2, p_slope, 
-          labels = c("A", "B"), 
-          rel_widths = c(1, 1.5),
+plot_grid(p_r2, p_int, p_slope, 
+          labels = c("A", "B", "C"), 
+          rel_widths = c(1, 1, 1.5),
           nrow = 1)
-ggsave("figures/231221_scaling_by_quantile.png", width = 10, height = 5)
+ggsave("figures/231221_scaling_by_quantile.png", width = 13, height = 5)
 
 scaling_data_raw <- scaling_analysis_dat %>% 
   dplyr:: select(basin_cat,
