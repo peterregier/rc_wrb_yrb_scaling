@@ -156,7 +156,7 @@ create_full_plots <- function(data, selected_basin) {
   if (selected_basin == "yakima") {
     plot <- plot + theme(axis.title.y = element_blank(), axis.text.y = element_blank())
   } else {
-    plot <- plot + ylab(expression(bold(paste("Cumulative Aerobic", " ", respiration[Hyp], "(", gCO[2] * d^-1 * m^-2, ")"))))
+    plot <- plot + ylab(expression(bold(paste("Cumulative Aerobic", " ", respiration[Hyp], "(", gCO[2] * d^-1, ")"))))
   }
   
   # No x-axis title for any plots
@@ -168,8 +168,8 @@ create_full_plots <- function(data, selected_basin) {
 plot_grid(create_full_plots(scaling_analysis_dat, "willamette"), 
           create_full_plots(scaling_analysis_dat, "yakima"), 
           nrow = 1)
-ggsave("figures/s_figure2_no_hef.png", width = 24, height = 12)
-ggsave("figures/s_figure2_no_hef.pdf", width = 24, height = 12)
+ggsave("figures/s4_figure2_no_hef.png", width = 24, height = 12)
+ggsave("figures/s4_figure2_no_hef.pdf", width = 24, height = 12)
 
 
 # 4. Load regression data ------------------------------------------------------
