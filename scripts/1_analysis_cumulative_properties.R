@@ -96,9 +96,9 @@ scaling_analysis_dat <- scaling_analysis_dat %>%
                 .names = "accm_{.col}")) %>%
   ungroup()
 
-
-write.csv(scaling_analysis_dat,paste(local_data,"scaling_analysis_dat_cumulative.csv", sep = "/"),
-          row.names = FALSE)
+## Commenting out because this dataset is not used
+# write.csv(scaling_analysis_dat,paste(local_data,"scaling_analysis_dat_cumulative.csv", sep = "/"),
+#           row.names = FALSE)
 
 
 # Cumulative entropy
@@ -200,9 +200,9 @@ ggplot(data = scaling_analysis_accm_dat,
   geom_abline()+
   facet_wrap(~basin_cat, ncol = 2, scales = "free")
 
-
-write.csv(scaling_analysis_accm_dat,paste(local_data,"231008_scaling_analysis_dat.csv", sep = "/"),
-            row.names = FALSE)
+## This is commented out because the bootstrapping process will always slightly change the dataset used 
+# write.csv(scaling_analysis_accm_dat,paste(local_data,"231008_scaling_analysis_dat.csv", sep = "/"),
+#             row.names = FALSE)
 
 
  

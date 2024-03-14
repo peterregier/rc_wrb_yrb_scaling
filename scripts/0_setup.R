@@ -25,7 +25,6 @@ scaling_analysis_dat <- read_csv("data/231008_scaling_analysis_dat.csv")
 
 # Creating breaks for logarithmic scale 
 # (see: https://r-graphics.org/recipe-axes-axis-log)
-
 breaks <- 10^(-10:20)
 breaks_c <- 10^seq(-10,20,by=4)
 minor_breaks <- rep(1:9, 31)*(10^rep(-10:20, each=9))
@@ -99,8 +98,3 @@ bootstrap_regression <- function(data, n_bootstraps, block_size) {
   
   return(results)
 }
-
-
-## From 
-
-

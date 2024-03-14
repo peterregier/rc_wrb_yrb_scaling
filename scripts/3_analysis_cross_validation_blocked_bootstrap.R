@@ -105,31 +105,9 @@ combined_results <- left_join(model_results, results_df, by = c("basin", "quanti
 #   geom_point()
 # p
 
-write.csv(combined_results,
-          file = paste(local_data,"guerrero_etal_23_results_cross_validation_block_bootstrap_scaling.csv",
-                       sep = '/'),
-          row.names = FALSE)
+## This is commented out because the bootstrapping process will always slightly change the dataset used 
+# write.csv(combined_results,
+#           file = paste(local_data,"guerrero_etal_23_results_cross_validation_block_bootstrap_scaling.csv",
+#                        sep = '/'),
+#           row.names = FALSE)
 
-# 
-# p <- ggplot(data = data %>% 
-#               mutate(accm_hzt_cat = factor(accm_hzt_cat,
-#                                            levels = c("Q10","Q20","Q30","Q40",
-#                                                       "Q50", "Q60", "Q70", "Q80",
-#                                                       "Q90", "Q100"))), 
-#             aes(x = wshd_area_km2,
-#                 y = accm_totco2_o2g_day,
-#                 color = accm_hzt_cat))+
-#   # geom_point()+
-#   geom_smooth(method = 'lm',
-#               fullrange = TRUE)+
-#   geom_abline(intercept = 2,
-#               linetype = "dashed",
-#               linewidth = 1)+
-#   scale_x_log10()+
-#   scale_y_log10()+
-#   scale_color_viridis_d()+
-#   # facet_wrap(basin~accm_hzt_cat, nrow = 2)+
-#   facet_wrap(~basin, ncol = 2)+
-#   theme(legend.position = "none")
-# p
-#   
