@@ -47,16 +47,18 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
-figures/.DS_Store
+
 .DS_Store
+figures/.DS_Store
+
 data/nsi_network_ywrb
-figures/proposal
+data/data_backup
 
 writing/
 
 figures/1_Figure1_maps.afdesign
-
 figures/backup
+figures/proposal
 
 scripts/archive
 scripts/agu_map_figure.afdesign
