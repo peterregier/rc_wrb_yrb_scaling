@@ -57,8 +57,10 @@ data/data_backup
 writing/
 
 figures/1_Figure1_maps.afdesign
-figures/backup
-figures/proposal
+figures/figures_agu_poster
+figures/figures_archive
+figures/figures_backup
+figures/figures_proposal
 
 scripts/archive
 scripts/agu_map_figure.afdesign
