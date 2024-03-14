@@ -73,7 +73,8 @@ plot_grid(p_r2, p_int, p_slope,
           labels = c("A", "B", "C"), 
           rel_widths = c(1, 1, 1.5),
           nrow = 1)
-ggsave("figures/231221_scaling_by_quantile.png", width = 13, height = 5)
+ggsave("figures/s3_scaling_by_quantile.png", width = 13, height = 5)
+ggsave("figures/s3_scaling_by_quantile.pdf", width = 13, height = 5)
 
 scaling_data_raw <- scaling_analysis_dat %>% 
   dplyr:: select(basin_cat,
@@ -136,14 +137,14 @@ scaling_plot <- plot_grid(make_scaling_plot("Yakima River (Dry)", "Yakima River 
 
 scaling_legend <- get_legend(make_scaling_plot("Yakima River (Dry)", "Yakima River"))
 
-figure3 <- plot_grid(make_scaling_plot("Yakima River (Dry)", "Yakima River (YRB)") + 
-                       theme(legend.position = "none"),
-                     make_scaling_plot("Willamette River (Wet)", "Willamette River (WRB)") + 
-                       theme(legend.position = "none"), 
-                     scaling_legend, 
-                     nrow = 1, 
-                     rel_widths = c(1, 1, 0.3))
-ggsave("figures/231219_Figure3.png", width = 10, height = 5)
+# figure3 <- plot_grid(make_scaling_plot("Yakima River (Dry)", "Yakima River (YRB)") + 
+#                        theme(legend.position = "none"),
+#                      make_scaling_plot("Willamette River (Wet)", "Willamette River (WRB)") + 
+#                        theme(legend.position = "none"), 
+#                      scaling_legend, 
+#                      nrow = 1, 
+#                      rel_widths = c(1, 1, 0.3))
+# ggsave("figures/231219_Figure3.png", width = 10, height = 5)
 
 
 # 1. Read in watershed shapefiles ----------------------------------------------
@@ -220,8 +221,8 @@ plot_grid(yrb_faceted_scaling,
           ncol = 1, 
           rel_heights = c(1, 1), 
           align = "hv")
-ggsave("figures/3_figure3_faceted.png", width = 12, height = 8)
-ggsave("figures/3_figure3_faceted.pdf", width = 12, height = 8)
+ggsave("figures/3_Figure3.png", width = 12, height = 8)
+ggsave("figures/3_Figure3.pdf", width = 12, height = 8)
 
 # 3. Read in MI dataset --------------------------------------------------------
 

@@ -100,5 +100,5 @@ ggplot(scaling_data_raw, aes(wshd_area_km2, wshd_max_elevation_m, color = basin)
   geom_smooth(method = "lm", aes(group = basin), color = "black") + 
   scale_x_log10() + 
   scale_y_log10()
-ggsave("figures/s_elevation_v_area.png", width = 5, height = 4)
-ggsave("figures/s_elevation_v_area.pdf", width = 5, height = 4)
+ggsave("figures/s5_elevation_v_area.png", width = 5, height = 4)
+ggsave("figures/s5_elevation_v_area.pdf", width = 5, height = 4)

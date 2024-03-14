@@ -16,16 +16,6 @@
 source("scripts/0_setup.R")
 p_load(segmented)
 
-# ## Alterative time-line: what's the scaling feature as described in Wollheim et al. 2022?
-# scaling_means <- scaling_analysis_dat %>% 
-#   filter(wshd_area_km2 > 0.9 & 
-#            wshd_area_km2 < 1.1) %>% 
-#   group_by(basin) %>% 
-#   summarize(mean_accm_totco2_o2g_day = mean(accm_totco2_o2g_day))
-# 
-# scaling_analysis_dat2 <- scaling_analysis_dat %>% 
-#   mutate(n_accm_totco2_o2g_day = case_when(basin == "willamette" ~ accm_totco2_o2g_day / 8441,  # see scaling_means
-#                                            basin == "yakima" ~ accm_totco2_o2g_day / 3804))
 
 # 2. Plotting function from Fco ------------------------------------------------
 
@@ -105,9 +95,6 @@ plot_willamette
 plot_yakima <- create_faceted_plots(scaling_analysis_dat, "yakima")
 plot_yakima
 
-plot_grid(plot_willamette, plot_yakima, nrow = 1)
-
-#ggsave("figures/240220_normalized_respiration.png", width = 24, height = 10)
 
 # 3.5. Make full watershed plots -----------------------------------------------
 

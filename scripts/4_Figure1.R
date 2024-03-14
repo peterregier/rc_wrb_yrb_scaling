@@ -122,28 +122,3 @@ plot_grid(wa_or_plot,
 ## Save layers as raw figure, which is then cleaned up in Affinity Designer
 ggsave("figures/raw_Figure1_maps.pdf", width = 12, height = 4)
 
-
-#### GRAVEYARD OF POTENTIALLY USEFUL, BUT NOT CURRENTLY USED CODE ####
-
-# # 6. Make HEF maps (currently not used) --------------------------------------
-# 
-# ## First, reorder the HEF levels
-# scaling_map_sf$accm_hzt_cat <- fct_relevel(scaling_map_sf$accm_hzt_cat, "Q100", after = Inf)
-# 
-# yrb_hef <- ggplot() +
-#   geom_sf(data = scaling_map_sf %>% filter(basin == "yakima"), 
-#           aes(color = accm_hzt_cat), show.legend = F) + 
-#   geom_sf(data = yakima_boundary, fill = NA, color = "black") + 
-#   scale_color_viridis_d() + 
-#   theme_map() + 
-#   labs(color = "HEF quantile") + 
-#   theme(legend.position = c(0.8, 0.7), 
-#         legend.background = element_blank())
-# 
-# wrb_hef <- ggplot() +
-#   geom_sf(data = scaling_map_sf %>% filter(basin == "willamette"), aes(color = accm_hzt_cat)) + 
-#   geom_sf(data = willamette_boundary, fill = NA, color = "black") + 
-#   scale_color_viridis_d() + 
-#   theme_map() + 
-#   labs(color = "HEF quantile")
-
