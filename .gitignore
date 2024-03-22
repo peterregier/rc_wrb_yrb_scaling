@@ -64,3 +64,5 @@ figures/figures_proposal
 
 scripts/scripts_archive
 scripts/agu_map_figure.afdesign
+data/4Peter/nc_loading_lateral.csv
+data/4Peter/nc_loading_vertical.csv
