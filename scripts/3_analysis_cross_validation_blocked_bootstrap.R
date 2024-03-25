@@ -3,6 +3,9 @@
 # dependent cumulative data: Cross-validation
 ################################################################################
 
+#By : Francisco Guerrero
+## Contact: peter.regier@pnnl.gov
+
 # Algorithm design and code evaluation: Francisco J. Guerrero 
 # Code writing: AI-driven coding and data analysis tool developed by OpenAI.
 

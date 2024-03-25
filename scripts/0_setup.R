@@ -1,6 +1,7 @@
 ## Setup file for consistency across scripts
 ##
 ## Code from Francisco Guerrero and Peter Regier
+## Contact: peter.regier@pnnl.gov
 
 ## Load packages
 require(pacman)

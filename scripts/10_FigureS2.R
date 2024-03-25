@@ -1,6 +1,11 @@
-## This script tries to replicate parts of the conceptual figure in Wil's paper
-## to illustrate claculating cumualtive metrics for allometric scaling
+## This script creates an illustrative example of how cumulative respiration is
+## calculated in a sub-watershed
 ##
+## Peter Regier (with code from Francisco)
+## Contact: peter.regier@pnnl.gov
+##
+# ########### #
+# ########### #
 
 # 1. Setup ---------------------------------------------------------------------
 
@@ -36,7 +41,6 @@ scaling_dat_trimmed <- scaling_map_dat %>%
 
 scaling_sf <- inner_join(yrb %>% clean_names(), 
                              scaling_dat_trimmed, by = "comid")
-
 
 ## 50 is pretty good
 ## 60 is ok

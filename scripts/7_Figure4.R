@@ -1,13 +1,19 @@
-## What about mutual information?
+## This script creates Figure 4, which presents mutual information for two groups
+## of quantiles (Q10-30 and Q80-100) for each basin
 ##
+## Peter Regier
+## Contact: peter.regier@pnnl.gov
+##
+# ########### #
+# ########### #
 
 # 1. Setup ---------------------------------------------------------------------
 
+## Load setup information
 source("scripts/0_setup.R")
 
-p_load(RandomForestsGLS, #not using (doesn't easily give VI)
-       ggpmisc,
-       SpatialML,
+## Load additional packages
+p_load(ggpmisc,
        PNWColors,
        infotheo,
        tidymodels,

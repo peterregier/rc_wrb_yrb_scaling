@@ -1,8 +1,9 @@
-## This script is for a redesign of Figure 4, which was originally just scaling
-## maps, but is going to be scaling maps smooshed together with mutual information
+## This script creates Figure 3 (spatial distributions of scaling by reach) and
+## Figure S3
 ##
 ## Peter Regier
 ## 2023-12-18
+## Contact: peter.regier@pnnl.gov
 ##
 # ########### #
 # ########### #

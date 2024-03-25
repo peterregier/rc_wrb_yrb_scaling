@@ -1,7 +1,8 @@
-## Explore potential correlations
+## This script creates Figure 5 (elevation/precip regression plots) and Figure S5
 ##
 ## Peter Regier
 ## 2023-12-30
+## Contact: peter.regier@pnnl.gov
 ##
 # ########### #
 # ########### #

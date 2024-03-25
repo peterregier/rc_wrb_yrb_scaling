@@ -1,7 +1,14 @@
-## This script takes Fco's code from https://github.com/Scaling-Watershed-Function/2-swf-analytical.engine
-## as of 11/30/23 and recreates figures so I can edit for AGU poster
+## This script takes Fco's code from 
+## and creates Figure S1
 ##
+## Peter Regier (with code from Francisco)
+## See: https://github.com/Scaling-Watershed-Function/2-swf-analytical.engine
+## Contact: peter.regier@pnnl.gov
+##
+# ########### #
+# ########### #
 
+# 1. Setup ---------------------------------------------------------------------
 
 source("scripts/0_setup.R")
 

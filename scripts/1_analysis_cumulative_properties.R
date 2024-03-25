@@ -5,6 +5,7 @@
 
 #By : Francisco Guerrero
 #Data source: Data sets generated with "script_comid_ref_landuse.R"
+## Contact: peter.regier@pnnl.gov
 
 #Loading packages:
 
