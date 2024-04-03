@@ -158,10 +158,7 @@ scaling_analysis_accm_dat <- scaling_analysis_dat %>%
   mutate(weight = wshd_area_km2/down_wshd_area_km2,
          h_hw = if_else(stream_order == 1, ht, 0),
          h_nw = weight*ht,
-         h_tot = h_hw + h_nw,
-         accm_ent_bytes = calculate_arbolate_sum(data.frame(ID = comid,
-                                                            toID = tocomid,
-                                                            length = h_tot)))
+         h_tot = h_hw + h_nw)
 
 # Calculating entropy and simpson's D with a 3 classes space
 scaling_analysis_accm_dat <-  scaling_analysis_accm_dat %>% 
@@ -181,25 +178,12 @@ scaling_analysis_accm_dat <-  scaling_analysis_accm_dat %>%
          human_3_area_km2 = human_3scp * wshd_area_km2 + runif(length(human_3scp), min = 0, max = 0.001)) %>%
   ungroup() %>% 
   mutate(accm_hzt_cat = factor(Hmisc::cut2(accm_water_exchng_kg_d/wshd_area_km2, g = 10),labels = qlabel),
-         accm_ent_cat = factor(Hmisc::cut2(accm_ent_bytes, g = 10),labels = qlabel),
          forest_area_cat = factor(Hmisc::cut2(forest_3_area_km2, g = 10),labels = qlabel),
          shrub_area_cat = factor(Hmisc::cut2(shrub_3_area_km2, g = 10),labels = qlabel),
          human_area_cat = factor(Hmisc::cut2(human_3_area_km2, g = 10),labels = qlabel),
          hr3_cat = factor(Hmisc::cut2(hrel_3, g = 10),labels = qlabel),
          smp3_cat = factor(Hmisc::cut2(simpson_d3, g = 10),labels = qlabel),
          frs3_cat = factor(Hmisc::cut2(forest_3scp, g = 10),labels = qlabel))
-
-
-ggplot(data = scaling_analysis_accm_dat,
-            aes(x = accm_inc_comid,
-                y = accm_totco2_o2g_day,
-                color = as.factor(stream_order)))+
-  geom_point()+
-  scale_x_log10()+
-  scale_y_log10()+
-  scale_color_viridis_d()+
-  geom_abline()+
-  facet_wrap(~basin_cat, ncol = 2, scales = "free")
 
 ## This is commented out because the bootstrapping process will always slightly change the dataset used 
 # write.csv(scaling_analysis_accm_dat,paste(local_data,"231008_scaling_analysis_dat.csv", sep = "/"),
