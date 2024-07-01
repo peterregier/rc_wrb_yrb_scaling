@@ -67,9 +67,11 @@ predictors_new <- c("forest_3scp",
 df <- scaling_data_combined %>% 
   #filter(quantile_n < 40 | quantile_n > 70) %>% 
   mutate(quantile_cat = case_when(quantile_n < 40 ~ "Q10-30", 
+                                  #quantile_n >= 40 & quantile_n <= 70 ~ "Q40-70",
                                   quantile_n > 70 ~ "Q80-100", 
                                   TRUE ~ NA)) %>% 
-  dplyr::select(basin, quantile_cat, all_of(predictors_new), accm_totco2_o2g_day) %>% 
+  mutate(white_noise = rnorm(1:n(), mean = 0, sd = 1)) %>% 
+  dplyr::select(basin, quantile_cat, all_of(predictors_new), white_noise, accm_totco2_o2g_day) %>% 
   drop_na() %>% 
   ungroup()
 
@@ -114,11 +116,13 @@ mi_outputs <- mi_to_run %>%
                           vars == "human_3scp" ~ "% Human-influenced", 
                           vars == "wshd_max_elevation_m" ~ "Max. elevation", 
                           vars == "mean_ann_pcpt_mm" ~ "Mean annual precip", 
+                          vars == "white_noise" ~ "White noise", 
                           TRUE ~ vars)) %>% 
   mutate(basin = case_when(basin == "yakima" ~ "Yakima", 
                            basin == "willamette" ~ "Willamette")) %>% 
   mutate(quantile_cat = case_when(quantile_cat == "Q10-30" ~ "Q10-30 (Uncertain)",
-                                  quantile_cat == "Q80-100" ~ "Q80-100 (Uncertain)"))
+                                  #quantile_cat == "Q40-70" ~ "Q40-70 (Variable)",
+                                  quantile_cat == "Q80-100" ~ "Q80-100 (Super-linear)"))
 
 mi_vars <- unique(mi_outputs$vars)
 mi_palette <- PNWColors::pnw_palette("Bay", n = length(mi_vars))

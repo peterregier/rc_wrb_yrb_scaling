@@ -62,7 +62,8 @@ scaling_data_combined %>%
                            basin == "willamette" ~ "Willamette (WRB)",)) %>% 
   ggplot(aes(wshd_max_elevation_m, accm_totco2_o2g_day)) + 
   #ggplot(scaling_data_combined, aes(wshd_max_elevation_m, accm_totco2_o2g_day / wshd_area_km2)) + 
-  geom_point(aes(color = scaling, size = mean_ann_pcpt_mm), alpha = 0.5) + 
+  #geom_point(aes(color = scaling, size = mean_ann_pcpt_mm), alpha = 0.5) + 
+  geom_point(aes(color = scaling), alpha = 0.5) + 
   geom_convexhull(aes(group = scaling, color = scaling, 
                       fill = scaling), alpha = 0.2) +
   #scale_x_log10() + 
@@ -75,11 +76,20 @@ scaling_data_combined %>%
   #ggpubr::stat_cor(aes(label = after_stat(rr.label)), geom = "label") + 
   labs(x = "Maximum watershed elevation (m)", 
        y = "Cumulative respiration (gCO2/day)",
-       size = "Mean precip (mm/yr)",
+       #size = "Mean precip (mm/yr)",
        color = "Scaling", 
        fill = "Scaling")
 ggsave("figures/5_Figure5.png", width = 10, height = 5)
 ggsave("figures/5_Figure5.pdf", width = 10, height = 5)
+
+
+scaling_data_combined %>% 
+  filter(scaling == "Uncertain") %>% 
+  mutate(basin = case_when(basin == "yakima" ~ "Yakima (YRB)", 
+                           basin == "willamette" ~ "Willamette (WRB)",)) %>% 
+  ggplot(aes(wshd_max_elevation_m, mean_ann_pcpt_mm)) + 
+  geom_point(aes(color = scaling)) + 
+  facet_wrap(~basin)
 
 # Make supplemental figure -----------------------------------------------------
 
