@@ -68,8 +68,16 @@ scaling_data_combined %>%
   geom_boxplot() + 
   facet_wrap(~basin) +
   labs(x = "Stream Order", y = "% urban land-cover", fill = "Scaling")
-ggsave("figures/s7_urban_v_scaling.png", width = 6, height = 4)
-ggsave("figures/s7_urban_v_scaling.pdf", width = 6, height = 4)
+ggsave("figures/s6_urban_v_scaling.png", width = 6, height = 4)
+ggsave("figures/s6_urban_v_scaling.pdf", width = 6, height = 4)
+
+
+scaling_data_combined %>% 
+  mutate(urban_cat = ifelse(human_3scp > 50, "urban", "non-urban")) %>% 
+  ggplot(aes(as.factor(urban_cat), water_exchng_kg_d)) + 
+  geom_boxplot() + 
+  scale_y_log10() + 
+  facet_wrap(~basin)
 
 
 scaling_data_combined %>% 
@@ -102,18 +110,20 @@ ggplot(x, aes(accm_water_exchng_kg_d, accm_totco2_o2g_day, color = basin)) +
 ggplot(x, aes(wshd_max_elevation_m, color = hef_cat, fill = hef_cat)) + 
   geom_density(alpha = 0.2) + 
   facet_wrap(~basin)
+ggsave("figures/s8_elevation_density_by_hef_cat.png", width = 8, height = 4)
+ggsave("figures/s8_elevation_density_by_hef_cat.pdf", width = 8, height = 4)
 
 
-ggplot(x, aes(totco2_o2g_day, color = hef_cat, fill = hef_cat)) + 
-  geom_density(alpha = 0.2) + 
-  scale_x_log10() +
-  facet_wrap(~basin, scales = "free_x") + 
-  labs(x = "HZ reach-scale aerobic respiration (gCO2d-1)", 
-       y = "Density", 
-       color = "HEF quantile", 
-       fill = "HEF quantile")
-ggsave("figures/s8_urban_v_scaling.png", width = 7, height = 4)
-ggsave("figures/s8_urban_v_scaling.pdf", width = 7, height = 4)
+# ggplot(x, aes(totco2_o2g_day, color = hef_cat, fill = hef_cat)) + 
+#   geom_density(alpha = 0.2) + 
+#   scale_x_log10() +
+#   facet_wrap(~basin, scales = "free_x") + 
+#   labs(x = "HZ reach-scale aerobic respiration (gCO2d-1)", 
+#        y = "Density", 
+#        color = "HEF quantile", 
+#        fill = "HEF quantile")
+# ggsave("figures/s6_urban_v_scaling.png", width = 7, height = 4)
+# ggsave("figures/s6_urban_v_scaling.pdf", width = 7, height = 4)
 
 
 ###########
@@ -137,16 +147,18 @@ plot_grid(ggplot(x, aes(as.factor(quantile),
           ggplot(x, aes(as.factor(quantile),
                                            water_exchng_kg_d, 
                                             color = basin)) + 
-            geom_boxplot(show.legend = F) + 
-            scale_y_log10(), 
+            geom_boxplot(show.legend = T) + 
+            scale_y_log10() + 
+            theme(legend.position = c(0.8,0.2), 
+                  legend.background = element_blank()), 
           ggplot(x, aes(as.factor(quantile), 
                                            tot_rt_hz_s, 
                                             color = basin)) + 
             geom_boxplot(show.legend = F) + 
             scale_y_log10(), 
           nrow = 1)
-ggsave("figures/sa_urban_v_scaling.png", width = 8, height = 4)
-ggsave("figures/sa_urban_v_scaling.pdf", width = 8, height = 4)
+ggsave("figures/s7_doc_ex_rt_by_quantile.png", width = 10, height = 4.5)
+ggsave("figures/s7_doc_ex_rt_by_quantile.pdf", width = 10, height = 4.5)
 
 
 
