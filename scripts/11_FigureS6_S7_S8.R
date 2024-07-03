@@ -136,22 +136,22 @@ scaling_analysis_dat %>%
 
 ###########
 
-x <- scaling_data_combined %>% 
+y <- scaling_data_combined %>% 
   mutate(quantile = fct_relevel(as.factor(quantile), "Q100", after = Inf))
 
-plot_grid(ggplot(x, aes(as.factor(quantile), 
+plot_grid(ggplot(y, aes(as.factor(quantile), 
                                            doc_load_kg_d, 
                                             color = basin)) + 
             geom_boxplot(show.legend = F) + 
             scale_y_log10(), 
-          ggplot(x, aes(as.factor(quantile),
+          ggplot(y, aes(as.factor(quantile),
                                            water_exchng_kg_d, 
                                             color = basin)) + 
             geom_boxplot(show.legend = T) + 
             scale_y_log10() + 
             theme(legend.position = c(0.8,0.2), 
                   legend.background = element_blank()), 
-          ggplot(x, aes(as.factor(quantile), 
+          ggplot(y, aes(as.factor(quantile), 
                                            tot_rt_hz_s, 
                                             color = basin)) + 
             geom_boxplot(show.legend = F) + 
