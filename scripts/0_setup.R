@@ -1,10 +1,19 @@
-## Setup file for consistency across scripts
+## This script sets up your R environment to run all other scripts. This includes
+## loading packages, setting the ggplot themes, reading in datasets used across
+## multiple scripts and setting up a bootstrapping function.
 ##
-## Code from Francisco Guerrero and Peter Regier
+## Code from Francisco J. Guerrero and Peter Regier
 ## Contact: peter.regier@pnnl.gov
+##
+# ############### #
+# ############### #
+
+# 1. Load packages -------------------------------------------------------------
+
+## Load pacman
+require(pacman)
 
 ## Load packages
-require(pacman)
 p_load(tidyverse,
        cowplot,
        janitor,
@@ -13,16 +22,40 @@ p_load(tidyverse,
        rnaturalearth, 
        ggthemes, 
        ggallin,
+       entropy, 
+       usethis, 
+       GGally, 
+       gridExtra, 
+       ggExtra, 
+       data.table, 
+       viridis,
        scales, #trans_format()
        PNWColors)
 
-## Set ggplot theme default
-theme_set(theme_bw())
 
-## Core dataset that's used for most things, so load it
+# 2. Read in bedrock datasets --------------------------------------------------
+
+## 1. RCM model outputs
+## Backbone of the analysis - modeled reach-scale respiration + watershed characteristics
+## Source - RCM model
+rcm_23_model_output_dat <- read_csv("data/rcm_23_model_output_data.csv")
+
+## 2. Land cover information - this one is a little tricky
+## Data originate from https://www.mrlc.gov/data/nlcd-2019-land-cover-conus
+## Two levels used: catchment (smaller) and watershed (larger)
+## 
+
+## Core dataset that's used for most things, so load it. This dataset is 
+## created in 1_analysis_cumulative_properties.R from 
+## rcm_23_model_output_dat (231008_landscape_heterogeneity_pnw.csv)
+## and wshd_ent_dat (rcm_23_model_output_data.csv)
 scaling_analysis_dat <- read_csv("data/231008_scaling_analysis_dat.csv")
 
-## Plotting details baked into Fco functions
+
+# 3. ggplot preferences and custom theme ---------------------------------------
+
+## Set ggplot theme default
+theme_set(theme_bw())
 
 # Creating breaks for logarithmic scale 
 # (see: https://r-graphics.org/recipe-axes-axis-log)
@@ -30,6 +63,7 @@ breaks <- 10^(-10:20)
 breaks_c <- 10^seq(-10,20,by=4)
 minor_breaks <- rep(1:9, 31)*(10^rep(-10:20, each=9))
 
+## Custom theme
 theme_httn<-  theme(axis.text=element_text(colour="black",size=22),
                     axis.title = element_text(size = 32, face = "bold"),
                     panel.grid.minor= element_line(colour = "gray", linetype = "dotted"), 
@@ -45,6 +79,9 @@ theme_httn<-  theme(axis.text=element_text(colour="black",size=22),
                     legend.key.size = unit(1.0, 'lines'),#Changing spacing between legend keys
                     legend.title = element_text())
 
+
+# 4. Standardized spatial coordinate reference system --------------------------
+
 ## Set common CRS so everything is projected the same way
 common_crs = 4326
 
@@ -54,6 +91,8 @@ coord_sf_crs = "+proj=aea +lat_1=25 +lat_2=50 +lon_0=-100"
 
 ### Originally from https://github.com/Scaling-Watershed-Function/2-swf-analytical.engine/blob/32dab31ca15c2c5f689ebd2de72d02ffef24e44f/scaling_analysis_willamette_yakima_rcm_23/source/function_blocked_bootstrap.R
 
+# 5. Blocked bootstrap function ------------------------------------------------
+
 ################################################################################
 # Blocked Bootstrap Regression for Scaling Exponent estimation in longitudinally
 # dependent cumulative data
@@ -61,6 +100,9 @@ coord_sf_crs = "+proj=aea +lat_1=25 +lat_2=50 +lon_0=-100"
 
 # Algorithm design and code evaluation: Francisco J. Guerrero 
 # Code writing: AI-driven coding and data analysis tool developed by OpenAI.
+
+## Standardize the block size across all scripts
+block_size <- 50
 
 # Define the bootstrap function
 bootstrap_regression <- function(data, n_bootstraps, block_size) {
@@ -99,3 +141,4 @@ bootstrap_regression <- function(data, n_bootstraps, block_size) {
   
   return(results)
 }
+

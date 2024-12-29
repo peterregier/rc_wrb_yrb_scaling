@@ -142,3 +142,6 @@ mi_outputs %>%
   scale_fill_manual(values = mi_colors$colors)
 ggsave("figures/4_Figure4.png", width = 8, height = 6)
 ggsave("figures/4_Figure4.pdf", width = 8, height = 6)
+
+
+

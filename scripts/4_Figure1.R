@@ -1,8 +1,7 @@
 ## This script makes the map elements used in Figure 1 as well as supplemental
 ## maps of 
 ## 
-## Peter Regier (some code from Francisco)
-## 2024-01-05
+## Code from Francisco Guerrero and Peter Regier
 ## Contact: peter.regier@pnnl.gov
 ##
 # ######### #
@@ -121,5 +120,5 @@ plot_grid(wa_or_plot,
           labels = c("A", "B", "C"))
           
 ## Save layers as raw figure, which is then cleaned up in Affinity Designer
-ggsave("figures/raw_Figure1_maps.pdf", width = 12, height = 4)
+ggsave("figures/1_raw_Figure1_maps.pdf", width = 12, height = 4)
 

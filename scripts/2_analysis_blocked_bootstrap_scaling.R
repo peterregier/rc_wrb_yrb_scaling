@@ -3,39 +3,26 @@
 # dependent cumulative data: Regression Coefficients
 ################################################################################
 
-#By : Francisco Guerrero
+## Code from Francisco J. Guerrero and Peter Regier
 ## Contact: peter.regier@pnnl.gov
 
-# Algorithm design and code evaluation: Francisco J. Guerrero 
-# Code writing: AI-driven coding and data analysis tool developed by OpenAI.
+## Algorithm design and code evaluation: Francisco J. Guerrero 
+## Code writing: AI-driven coding and data analysis tool developed by OpenAI.
 
 
-librarian::shelf(dplyr,
-                 tidyr,
-                 purrr,
-                 broom,
-                 ggplot2,
-                 tidyverse)
-
-local_data <- "./data"
-#results <- "./results"
-#results_png <- "/Users/guerrero-fj/Library/Mobile Documents/com~apple~CloudDocs/scaling_watershed_function/analytical_engine/scaling_analysis_willamette_yakima_23/results"
-#findings_png <- "/Users/guerrero-fj/Library/Mobile Documents/com~apple~CloudDocs/scaling_watershed_function/analytical_engine/scaling_analysis_willamette_yakima_23/findings"
+# 1. Setup ---------------------------------------------------------------------
 
 #source("./source/function_blocked_bootstrap.R")
 source("./scripts/0_setup.R")
 
 # Load the data
-data <- read_csv(paste(local_data,"231008_scaling_analysis_dat.csv", sep = "/"),
-                 show_col_types = FALSE)
+data <- read_csv("data/231008_scaling_analysis_dat.csv", show_col_types = FALSE)
 
 
-
-# We selected a block size of 50
+# 2. Run bootstrapping ---------------------------------------------------------
 
 # Run the bootstrap regression
 n_bootstraps <- 1000
-block_size <- 50
 bootstrap_results <- bootstrap_regression(data, n_bootstraps, block_size)
 
 # Convert the results to a data frame
@@ -43,6 +30,9 @@ results_df <- map_df(bootstrap_results, ~tibble(.x), .id = "Basin_HztCat")
 
 # Print the results
 print(results_df)
+
+
+# 3. Format bootstrapping results ----------------------------------------------
 
 # Unlist the nested list structure and create a vector
 unlisted_results <- unlist(results_df$.x)
@@ -87,7 +77,8 @@ mutate(basin = str_extract(Basin_HztCat, "^[^_]+",),
 reordered_results$quantile <- factor(reordered_results$quantile, 
                                      levels = c("Q10", "Q20", "Q30", "Q40", "Q50", "Q60", "Q70", "Q80", "Q90", "Q100"))
 
-# Saving results table
+
+# 4. Write out bootstrapping results -------------------------------------------
 
 ## This is commented out because the bootstrapping process will always slightly change the dataset used 
 # write.csv(reordered_results,

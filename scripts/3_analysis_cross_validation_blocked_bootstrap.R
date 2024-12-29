@@ -3,30 +3,23 @@
 # dependent cumulative data: Cross-validation
 ################################################################################
 
-#By : Francisco Guerrero
+## Code from Francisco J. Guerrero and Peter Regier
 ## Contact: peter.regier@pnnl.gov
 
 # Algorithm design and code evaluation: Francisco J. Guerrero 
 # Code writing: AI-driven coding and data analysis tool developed by OpenAI.
 
 
-librarian::shelf(dplyr,
-                 tidyr,
-                 purrr,
-                 broom,
-                 ggplot2,
-                 tidyverse)
-
-local_data <- "./data"
-#results <- "./results"
-#results_png <- "/Users/guerrero-fj/Library/Mobile Documents/com~apple~CloudDocs/scaling_watershed_function/analytical_engine/scaling_analysis_willamette_yakima_23/results"
-#findings_png <- "/Users/guerrero-fj/Library/Mobile Documents/com~apple~CloudDocs/scaling_watershed_function/analytical_engine/scaling_analysis_willamette_yakima_23/findings"
+# 1. Setup ---------------------------------------------------------------------
 
 #source("./source/function_blocked_bootstrap.R")
 source("./scripts/0_setup.R")
 
+
+
+
 # Load the data
-data <- read_csv(paste(local_data,"231008_scaling_analysis_dat.csv", sep = "/"),
+data <- read_csv("data/231008_scaling_analysis_dat.csv",
                  show_col_types = FALSE)
 
 calculate_rmse <- function(actual, predicted) {
@@ -38,7 +31,6 @@ calculate_ssr <- function(actual, predicted) {
 }
 
 # Assuming 'data' is your original dataset
-block_size <- 50
 results_per_group <- list()
 
 for (basin in unique(data$basin)) {
@@ -87,9 +79,7 @@ results_df <- results_df %>%
 
 # Merging with model results
 
-model_results <- read_csv(paste(local_data, "guerrero_etal_23_results_block_bootstrap_scaling.csv",
-                                sep = '/'), show_col_types = FALSE)
-
+model_results <- read_csv("data/guerrero_etal_23_results_block_bootstrap_scaling.csv", show_col_types = FALSE)
 
 
 # Merge with the existing model results

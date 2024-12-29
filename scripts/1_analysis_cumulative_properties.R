@@ -3,37 +3,32 @@
 # CUMULATIVE CALCULATIONS ACROSS THE STREAM NETWORKS
 ###############################################################################
 
-#By : Francisco Guerrero
-#Data source: Data sets generated with "script_comid_ref_landuse.R"
+## Code from Francisco J. Guerrero and Peter Regier
 ## Contact: peter.regier@pnnl.gov
 
-#Loading packages:
+## Data source: Data sets generated with "script_comid_ref_landuse.R"
 
-#Run for the first time only
-#install.packages(librarian)
+
+# 1. Setup ---------------------------------------------------------------------
 
 # To run this code in macos it is necessary to install XQuartz from 
 #www.xquartz.org
 
-librarian::shelf(tidyverse,#(includes ggplot2, readr, dplyr, tidyr, and more...)
-                 entropy, usethis, GGally, nhdplusTools, gridExtra, ggExtra, data.table, viridis)
+## Set up environment
+source("scripts/0_setup.R")
 
+## Set seed for reproducible bootstrapping results
 set.seed(2703)
 
-# Data
-
-# Local data saving
-local_data <- "./data" 
-
-#  Local figure export
-results <- "./results" #For svg files that can be explored online
-
 # GitHub import
-wshd_ent_dat <-read_csv("https://raw.githubusercontent.com/Scaling-Watershed-Function/2-swf-analytical.engine/main/scaling_analysis_willamette_yakima_rcm_23/data/231008_landscape_heterogeneity_pnw.csv",
-                                show_col_types = FALSE)
+# wshd_ent_dat <-read_csv("https://raw.githubusercontent.com/Scaling-Watershed-Function/2-swf-analytical.engine/main/scaling_analysis_willamette_yakima_rcm_23/data/231008_landscape_heterogeneity_pnw.csv",
+#                                 show_col_types = FALSE)
+# rcm_23_model_output_dat <- read_csv("https://raw.githubusercontent.com/Scaling-Watershed-Function/2-swf-analytical.engine/main/scaling_analysis_willamette_yakima_rcm_23/data/rcm_23_model_output_data.csv",
+#                                     show_col_types = FALSE)
 
-rcm_23_model_output_dat <- read_csv("https://raw.githubusercontent.com/Scaling-Watershed-Function/2-swf-analytical.engine/main/scaling_analysis_willamette_yakima_rcm_23/data/rcm_23_model_output_data.csv",
-                                    show_col_types = FALSE)
+## Local import
+wshd_ent_dat <- read_csv("data/231008_landscape_heterogeneity_pnw.csv")
+rcm_23_model_output_dat <- read_csv("data/rcm_23_model_output_data.csv")
 
 
 # Merging datasets
@@ -100,7 +95,6 @@ scaling_analysis_dat <- scaling_analysis_dat %>%
 ## Commenting out because this dataset is not used
 # write.csv(scaling_analysis_dat,paste(local_data,"scaling_analysis_dat_cumulative.csv", sep = "/"),
 #           row.names = FALSE)
-
 
 # Cumulative entropy
 
@@ -188,6 +182,4 @@ scaling_analysis_accm_dat <-  scaling_analysis_accm_dat %>%
 ## This is commented out because the bootstrapping process will always slightly change the dataset used 
 # write.csv(scaling_analysis_accm_dat,paste(local_data,"231008_scaling_analysis_dat.csv", sep = "/"),
 #             row.names = FALSE)
-
-
  
