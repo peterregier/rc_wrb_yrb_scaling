@@ -1,12 +1,11 @@
 ## This script takes Fco's code from https://github.com/Scaling-Watershed-Function/2-swf-analytical.engine
-## as of 11/30/23 and recreates Figure 2 elements so I can edit for AGU poster
+## and modifies for current version of Figure 2
 ## 
 ## INPUTS: 
 ### scaling_analysis_dat (via 0_setup.R)
 ### guerrero_etal_23_results_cross_validation_block_bootstrap_scaling.csv
 ##
-## Peter Regier (some code from Francisco)
-## 2023-11-30
+## Code from Francisco J. Guerrero and Peter Regier
 ## Contact: peter.regier@pnnl.gov
 ##
 # ######### #
@@ -83,7 +82,7 @@ create_faceted_plots <- function(data, selected_basin) {
 }
 
 
-# 3. Make main plots -----------------------------------------------------------
+# 3. Make Figure 2 -------------------------------------------------------------
 
 #Willamette
 #plot_willamette <- create_faceted_plots(scaling_analysis_dat, "willamette")
@@ -96,8 +95,13 @@ plot_willamette
 plot_yakima <- create_faceted_plots(scaling_analysis_dat, "yakima")
 plot_yakima
 
+plot_grid(plot_willamette, plot_yakima, nrow = 1, 
+          rel_widths = c(1, 0.9))
+ggsave("figures/2_figure2.png", width = 20, height = 10)
+ggsave("figures/2_figure2.pdf", width = 20, height = 10)
 
-# 3.5. Make full watershed plots -----------------------------------------------
+
+# 3.5. Make basin-scale plots (Figure S4) --------------------------------------
 
 create_full_plots <- function(data, selected_basin) {
   
@@ -155,9 +159,9 @@ create_full_plots <- function(data, selected_basin) {
 
 plot_grid(create_full_plots(scaling_analysis_dat, "willamette"), 
           create_full_plots(scaling_analysis_dat, "yakima"), 
-          nrow = 1)
-ggsave("figures/s4_figure2_no_hef.png", width = 24, height = 12)
-ggsave("figures/s4_figure2_no_hef.pdf", width = 24, height = 12)
+          nrow = 1, rel_widths = c(1, 0.9))
+ggsave("figures/s4_figure2_no_hef.png", width = 24, height = 10)
+ggsave("figures/s4_figure2_no_hef.pdf", width = 24, height = 10)
 
 
 # 4. Load regression data ------------------------------------------------------

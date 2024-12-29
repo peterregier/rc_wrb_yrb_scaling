@@ -106,8 +106,26 @@ wrb_resp <- ggplot() +
 
 # 6. Assemble plots and export -------------------------------------------------
 
+## There's a new issue with get_legend caused by a recent ggplot update. Since
+## code was written prior to that update, I'm using a work-around provided by
+## clauswilke here: https://github.com/wilkelab/cowplot/issues/202
+
+get_legend_35 <- function(plot) {
+  # return all legend candidates
+  legends <- get_plot_component(plot, "guide-box", return_all = TRUE)
+  # find non-zero legends
+  nonzero <- vapply(legends, \(x) !inherits(x, "zeroGrob"), TRUE)
+  idx <- which(nonzero)
+  # return first non-zero legend if exists, and otherwise first element (which will be a zeroGrob) 
+  if (length(idx) > 0) {
+    return(legends[[idx[1]]])
+  } else {
+    return(legends[[1]])
+  }
+}
+
 ## Pull the legend as a separate object
-resp_legend = get_legend(wrb_resp + 
+resp_legend = get_legend_35(wrb_resp + 
                            theme(legend.position = c(0.5, 0.3)))
 
 ## Create the final plot by combining plot objects
