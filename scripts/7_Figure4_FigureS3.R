@@ -1,8 +1,7 @@
-## This script creates Figure 3 (spatial distributions of scaling by reach) and
+## This script creates Figure 4 (spatial distributions of scaling by reach) and
 ## Figure S3
 ##
-## Peter Regier
-## 2023-12-18
+## Code from Francisco J. Guerrero and Peter Regier
 ## Contact: peter.regier@pnnl.gov
 ##
 # ########### #

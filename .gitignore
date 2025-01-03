@@ -56,15 +56,11 @@ data/data_backup
 
 writing/
 
-figures/1_Figure1_maps.afdesign
-figures/figures_agu_poster
-figures/figures_archive
-figures/figures_backup
-figures/figures_proposal
-
 scripts/scripts_archive
 scripts/agu_map_figure.afdesign
 data/4Peter/nc_loading_lateral.csv
 data/4Peter/nc_loading_vertical.csv
 data/archive/*
+figures/archive*
+data/from_ess_dive*
 figures/figures_archive*
