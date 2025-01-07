@@ -78,3 +78,29 @@ ggsave("figures/3_scaling_by_quantile.png", width = 13, height = 5)
 ggsave("figures/3_scaling_by_quantile.pdf", width = 13, height = 5)
 
 
+## Potential supplemental figure
+make_regression_plot <- function(variable){
+  
+  df <- regression_estimates %>% 
+    dplyr::select("basin", "quantile", variable) %>% 
+    pivot_wider(names_from = "basin", values_from = variable) %>% 
+    clean_names() 
+  
+  fit = summary(lm(yakima_yrb~willamette_wrb, data = df))
+  r2 = round(fit[[9]], 2)
+  
+  r2
+
+  df %>%
+    ggplot(aes(willamette_wrb, yakima_yrb)) +
+    geom_point() +
+    geom_smooth(method = "lm") + 
+    labs(x = "WRB", y = "YRB", 
+         title = paste0(variable, ", r2 = ", r2))
+
+}
+
+make_regression_plot("slope")
+make_regression_plot("r_squared")
+make_regression_plot("intercept")
+

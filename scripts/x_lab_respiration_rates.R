@@ -176,15 +176,36 @@ sites_with_comids_and_ersed <- left_join(sites_with_comids, ersed_norm, by = "sa
 rate_comparisons <- inner_join(sites_with_comids_and_ersed, 
            scaling_dat_trimmed %>% 
              dplyr::select(comid, stream_order, totco2_o2g_day), 
-           by = "comid") 
+           by = "comid") %>% 
+  mutate(ersed_flipped = ersed_mg_l_d_mean * -1)
 
-rate_comparisons_trim <- rate_comparisons %>% 
-  filter(totco2_o2g_day < 8e6) %>% 
-  filter(ersed_mg_l_d_mean > -25000) 
+calculate_max <- function(var){
+  
+  x <- rate_comparisons %>% pull({{var}})
+  
+  q3 <- summary(x)[5]
+  max_value <- as.numeric(q3 + (IQR(x) * 1.5))
+  
+  max_value
+}
+
+rate_comparisons_labeled <- rate_comparisons %>% 
+  mutate(lab_outlier = case_when(ersed_flipped > calculate_max(ersed_flipped) ~ "outlier", 
+         TRUE ~ "nope")) %>% 
+  mutate(model_outlier = case_when(totco2_o2g_day > calculate_max(totco2_o2g_day) ~ "outlier", 
+         TRUE ~ "nope"))
+
+rate_comparisons_trim <- rate_comparisons_labeled %>%
+  #filter(lab_outlier != "outlier" & model_outlier != "outlier")
+  filter(totco2_o2g_day < 8e6) %>%
+  filter(ersed_mg_l_d_mean > -25000)
+
+
 
 plot_grid(rate_comparisons %>% 
   ggplot(aes(ersed_mg_l_d_mean, totco2_o2g_day, pch = basin)) + 
-  geom_point() + 
+  geom_point(color = "gray") + 
+    geom_point(data = rate_comparisons_trim, color = "black") + 
     labs(x = "Sediment resp (mg DO/L/d)", 
          y = "HZ resp. (g O2/d)", 
          pch = "Basin") + 
@@ -199,7 +220,7 @@ plot_grid(rate_comparisons %>%
     annotate(geom = "text", x = -1500, y = 4e6, 
              label = "R2adj = 0.09 (p = 0.03)"), 
   nrow = 1)
-ggsave("figures/sb_lab_model_resp_comparison.png", width = 8, height = 3.5)
+ggsave("figures/SC_lab_model_resp_comparison.png", width = 8, height = 3.5)
 
 ## adjR2 = 0
 summary(lm(totco2_o2g_day~ersed_mg_l_d_mean, data = rate_comparisons))

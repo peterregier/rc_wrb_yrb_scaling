@@ -12,6 +12,7 @@
 source("scripts/0_setup.R")
 p_load(plotly)
 
+
 # 2. Read in scaling dataset ---------------------------------------------------
 
 # Loading regression estimates dataset
@@ -19,7 +20,7 @@ regression_estimates_raw <-  read_csv("data/guerrero_etal_23_results_cross_valid
 
 ## Prep data
 reg_estimates_long <- regression_estimates_raw %>% 
-  select(basin,
+  dplyr::select(basin,
          quantile,
          Slope,
          RSquared,
@@ -42,39 +43,8 @@ regression_estimates <- regression_estimates_raw %>%
                              slope_ci_2_5 < 1 & slope_ci_97_5 < 1 & r_squared > 0.8 ~ "Sublinear", 
                              slope_ci_2_5 > 1 & slope_ci_97_5 > 1 & r_squared > 0.8 ~ "Super-linear", 
                              TRUE ~ "Uncertain")) %>% 
-  select(basin, quantile, r_squared, contains("r_squared_ci"), slope, contains("slope_ci"), intercept, contains("intercept_ci"), scaling) %>% 
+  dplyr::select(basin, quantile, r_squared, contains("r_squared_ci"), slope, contains("slope_ci"), intercept, contains("intercept_ci"), scaling) %>% 
   mutate(scaling = fct_relevel(scaling, c("Uncertain", "Sublinear")))
-
-
-p_r2 <-  ggplot(regression_estimates, aes(quantile, r_squared)) + 
-  geom_hline(yintercept = 1, linetype = "dashed") + 
-  geom_hline(yintercept = 0.8, linetype = "dashed") + 
-  geom_errorbar(aes(ymin = r_squared_ci_2_5, ymax = r_squared_ci_97_5), color = "gray", width = 0) + 
-  geom_point(size = 4) + 
-  labs(y = expression(R^2)) +
-  facet_wrap(~basin, ncol = 1) + 
-  scale_color_viridis_d()
-
-p_int <- ggplot(regression_estimates, aes(quantile, intercept)) + 
-  geom_hline(yintercept = 1, linetype = "dashed") + 
-  geom_errorbar(aes(ymin = intercept_ci_2_5, ymax = intercept_ci_97_5), color = "gray", width = 0) + 
-  geom_point(size = 4) + 
-  facet_wrap(~basin, ncol = 1) + 
-  scale_color_viridis_d()
-
-p_slope <- ggplot(regression_estimates, aes(quantile, slope)) + 
-  geom_hline(yintercept = 1, linetype = "dashed") + 
-  geom_errorbar(aes(ymin = slope_ci_2_5, ymax = slope_ci_97_5), color = "gray", width = 0) + 
-  geom_point(size = 4, aes( color = scaling)) + 
-  facet_wrap(~basin, ncol = 1) + 
-  scale_color_viridis_d()
-
-plot_grid(p_r2, p_int, p_slope, 
-          labels = c("A", "B", "C"), 
-          rel_widths = c(1, 1, 1.5),
-          nrow = 1)
-ggsave("figures/s3_scaling_by_quantile.png", width = 13, height = 5)
-ggsave("figures/s3_scaling_by_quantile.pdf", width = 13, height = 5)
 
 scaling_data_raw <- scaling_analysis_dat %>% 
   dplyr:: select(basin_cat,
@@ -90,61 +60,38 @@ scaling_data_raw <- scaling_analysis_dat %>%
   rename("quantile" = accm_hzt_cat)
 
 scaling_data_combined <- inner_join(scaling_data_raw, 
-                           regression_estimates, 
-                           by = c("basin", "quantile"))
-
+                                    regression_estimates, 
+                                    by = c("basin", "quantile"))
+  
 ## thx chat
-# last_row <- tail(scaling_data_combined, 1)
-# columns_to_keep <- c('basin_cat', 'basin', 'longitude', 'latitude', 'scaling')
+# last_row <- tail(scaling_data_combined, 1) %>% mutate(scaling = "Sublinear")
+# columns_to_keep <- c('basin_cat', 'basin', 
+#                      'longitude', 'latitude', 
+#                      'scaling')
 # last_row[, !(names(last_row) %in% columns_to_keep)] <- NA
 
 ## Add a single row to the end of WRB so sub-linear will have a facet
-#scaling_data <- bind_rows(scaling_data_raw, last_row)
-  
-scaling_sf <- st_as_sf(scaling_data_combined, 
+#scaling_data <- bind_rows(scaling_data_combined, last_row)
+scaling_data <- scaling_data_combined
+
+scaling_counts <- scaling_data %>%
+  ungroup() %>%
+  group_by(basin, scaling) %>%
+  count() %>%
+  ungroup() %>%
+  add_row(basin = "willamette",
+          scaling = "Sublinear",
+          n = 0) %>% 
+  group_by(basin) %>% 
+  mutate(perc = round(n / sum(n), 2))
+
+scaling_sf <- st_as_sf(scaling_data, 
                        coords = c("longitude", "latitude"), 
-                       crs = common_crs)
-
-make_scaling_plot <- function(selected_basin, title){
+                       crs = common_crs) %>% 
+  mutate(scaling2 = scaling)
   
-  plot_title = selected_basin
-  
-  data <- scaling_sf %>% 
-    filter(basin_cat == selected_basin)
-  
-  ggplot() + 
-    geom_sf(data = data, 
-            aes(color = scaling), alpha = 0.6) + 
-    scale_color_viridis_d() + 
-    ggtitle(title) + 
-    #theme_minimal() + 
-    theme_map() + 
-    theme(plot.title = element_text(hjust = 0.5, size=14,face="bold")) + 
-    #theme(plot.title = element_text(hjust = 0.5, size=14,face="bold"), 
-    #       axis.text=element_text(size=12),
-    #      axis.title=element_text(size=12), 
-    #      axis.text.y = element_text(angle = 30, vjust = 0.5, hjust=1)) + 
-    labs(color = "") + 
-    coord_sf(crs = coord_sf_crs)
-}
-
-scaling_plot <- plot_grid(make_scaling_plot("Yakima River (Dry)", "Yakima River (YRB)") + 
-                       theme(legend.position = "none"),
-                     make_scaling_plot("Willamette River (Wet)", "Willamette River (WRB)") + 
-                       theme(legend.position = "none"), 
-                     nrow = 1)
-                     #ncol = 1, rel_heights = c(1, 0.1, 1))
-
-scaling_legend <- get_legend(make_scaling_plot("Yakima River (Dry)", "Yakima River"))
-
-# figure3 <- plot_grid(make_scaling_plot("Yakima River (Dry)", "Yakima River (YRB)") + 
-#                        theme(legend.position = "none"),
-#                      make_scaling_plot("Willamette River (Wet)", "Willamette River (WRB)") + 
-#                        theme(legend.position = "none"), 
-#                      scaling_legend, 
-#                      nrow = 1, 
-#                      rel_widths = c(1, 1, 0.3))
-# ggsave("figures/231219_Figure3.png", width = 10, height = 5)
+  #left_join(., scaling_counts, by = c("basin", "scaling")) %>% 
+  #mutate(scaling2 = paste0(scaling, " (", n, ")"))
 
 
 # 1. Read in watershed shapefiles ----------------------------------------------
@@ -178,51 +125,32 @@ color_mapping <- c("Uncertain" = "#3E1152",
 
 ## To label outlets, we need to figure out where they are: 
 
-## Columbia: 24520498
-ggplot() + 
-  geom_sf(data = nsi %>% filter(grepl("^Columbia River", GNIS_NAME))) +
-  geom_sf_text(data = nsi %>% filter(grepl("^Columbia River", GNIS_NAME)), aes(label = COMID))
-
-wrb_outlet <- nsi %>% 
-  filter(COMID == 24520498) %>% 
-  slice(1) %>% 
-  st_point_on_surface()
-
-## Yakima: 23099408
-ggplotly(ggplot() + 
-  geom_sf(data = nsi %>% filter(grepl("Yakima River", GNIS_NAME))) +
-  geom_sf_text(data = nsi %>% filter(grepl("Yakima River", GNIS_NAME)), aes(label = COMID)))
-
-yrb_outlet <- nsi %>% 
-  filter(COMID == 23099408) %>% 
-  slice(1) %>% 
-  st_point_on_surface()
-
-
 yrb_faceted_scaling <- make_scaling_plot("Yakima River (Dry)", "Yakima River (YRB)") + 
   geom_sf(data = yakima_boundary, fill = NA, color = "black") + 
   geom_sf(data = nsi %>% filter(grepl("Yakima River", GNIS_NAME)), color = "blue", lwd = 0.2, alpha = 1) + 
   geom_sf(data = yrb_outlet, color = "black", size = 2) + 
   theme(legend.position = "none") + 
   scale_color_manual(values = color_mapping) + 
-  facet_wrap(~scaling, nrow = 1)
+  facet_wrap(~scaling2, nrow = 1)
 
 wrb_faceted_scaling <- make_scaling_plot("Willamette River (Wet)", "Willamette River (WRB)") + 
   geom_sf(data = willamette_boundary, fill = NA, color = "black") + 
   geom_sf(data = nsi %>% filter(grepl("^Willamette River", GNIS_NAME)), color = "blue", lwd = 0.2, alpha = 1) +
-  #geom_sf(data = nsi %>% filter(grepl("^Columbia River", GNIS_NAME)), color = "blue", lwd = 0.4, alpha = 1) +
   geom_sf(data = wrb_outlet, color = "black", size = 2) + 
   theme(legend.position = "none") + 
   scale_color_manual(values = color_mapping) + 
-  facet_wrap(~scaling, nrow = 1, drop = F)
+  facet_wrap(~scaling2, nrow = 1, drop = F)
+
+wrb_faceted_scaling
 
 plot_grid(yrb_faceted_scaling, 
           wrb_faceted_scaling, 
           ncol = 1, 
           rel_heights = c(1, 1), 
           align = "hv")
-ggsave("figures/3_Figure3.png", width = 12, height = 8)
-ggsave("figures/3_Figure3.pdf", width = 12, height = 8)
+ggsave("figures/4_Figure4.png", width = 12, height = 8)
+ggsave("figures/4_Figure4.pdf", width = 12, height = 8)
+
 
 # 3. Read in MI dataset --------------------------------------------------------
 
@@ -286,6 +214,7 @@ figure4 <- plot_grid(mi_plot, mi_legend,
                      nrow = 1, 
                      rel_widths = c(1, 0.3))
 ggsave("figures/231219_Figure4.png", width = 10, height = 3)
+
 
 # 4. Assemble plots ------------------------------------------------------------
 

@@ -57,11 +57,11 @@ wa_or_plot <- ggplot() +
 ## Prep scaling_analysis_dat
 scaling_map_dat <- scaling_analysis_dat %>% 
   mutate(log_mean_ann_pcpt_mm = log(mean_ann_pcpt_mm)) %>% 
-  mutate(dominant_lc = colnames(select(., contains("_3scp")))[max.col(select(., contains("_3scp")), "first")])
+  mutate(dominant_lc = colnames(dplyr::select(., contains("_3scp")))[max.col(dplyr::select(., contains("_3scp")), "first")])
 
 ## Prep scaling_analysis_dat
 scaling_dat_trimmed <- scaling_map_dat %>% 
-  select(comid, 
+  dplyr::select(comid, 
          basin_cat,
          basin,
          wshd_area_km2, 
@@ -79,6 +79,23 @@ scaling_map_sf <- inner_join(nsi %>% clean_names(),
 
 
 # 5. Make respiration maps -----------------------------------------------------
+
+make_map <- function(var){
+  scaling_map_sf
+}
+
+ggplot() +
+  geom_sf(data = scaling_map_sf %>% filter(basin == "yakima"), 
+          aes(color = accm_totco2_o2g_day), show.legend = F) + 
+  geom_sf(data = yakima_boundary, fill = NA, color = "black") + 
+  scale_color_viridis_c(trans = "log10") + 
+  theme_map() + 
+  labs(color = "Cumulative \n Respiration \n (gCO2/d)") + 
+  theme(legend.position = c(0.8, 0.7), 
+        legend.background = element_blank())
+
+
+
 
 ## Calculate stats to match colors between maps (facet_wrap(..., scales = F) fails w coord_sf)
 min_resp = min(scaling_dat_trimmed$accm_totco2_o2g_day)
