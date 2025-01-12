@@ -171,7 +171,7 @@ scaling_analysis_accm_dat <-  scaling_analysis_accm_dat %>%
          shrub_3_area_km2 = shrub_3scp * wshd_area_km2,
          human_3_area_km2 = human_3scp * wshd_area_km2 + runif(length(human_3scp), min = 0, max = 0.001)) %>%
   ungroup() %>% 
-  mutate(accm_hzt_cat = factor(Hmisc::cut2(accm_water_exchng_kg_d/wshd_area_km2, g = 10),labels = qlabel),
+  mutate(accm_hzt_cat = factor(Hmisc::cut2(accm_water_exchng_kg_d/wshd_area_km2, g = 10), labels = qlabel),
          forest_area_cat = factor(Hmisc::cut2(forest_3_area_km2, g = 10),labels = qlabel),
          shrub_area_cat = factor(Hmisc::cut2(shrub_3_area_km2, g = 10),labels = qlabel),
          human_area_cat = factor(Hmisc::cut2(human_3_area_km2, g = 10),labels = qlabel),

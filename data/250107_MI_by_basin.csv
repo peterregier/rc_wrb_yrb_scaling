@@ -1,0 +1,11 @@
+basin,nrow,vars,mi
+yakima,4604,forest_3scp,0.6186113931258177
+yakima,4604,shrub_3scp,0.4165753560779075
+yakima,4604,human_3scp,0.3470282801221636
+yakima,4604,wshd_max_elevation_m,0.906976443934222
+yakima,4604,mean_ann_pcpt_mm,0.4953019537560248
+willamette,5173,forest_3scp,0.5740999935031876
+willamette,5173,shrub_3scp,0.4422980875213245
+willamette,5173,human_3scp,0.6267188954021554
+willamette,5173,wshd_max_elevation_m,0.736369780508122
+willamette,5173,mean_ann_pcpt_mm,0.4377509728552962

@@ -10,6 +10,7 @@
 # 1. Setup ---------------------------------------------------------------------
 
 source("scripts/0_setup.R")
+p_load(viridis)
 
 
 # 2. Prep watershed boundaries and flowlines -----------------------------------
@@ -65,7 +66,9 @@ scaling_dat_trimmed <- scaling_map_dat %>%
          basin_cat,
          basin,
          wshd_area_km2, 
+         tot_q_hz_ms,
          accm_hzt_cat,
+         accm_water_exchng_kg_d,
          accm_totco2_o2g_day, 
          longitude,
          latitude,
@@ -75,85 +78,107 @@ scaling_dat_trimmed <- scaling_map_dat %>%
 
 ## Convert prepped dataset to an sf object for plotting
 scaling_map_sf <- inner_join(nsi %>% clean_names(), 
-                             scaling_dat_trimmed, by = "comid")
+                             scaling_dat_trimmed, by = "comid") %>% 
+  mutate(dominant_lc = case_when(dominant_lc == "shrub_3scp" ~ "Shrub", 
+                                 dominant_lc == "forest_3scp" ~ "Forest", 
+                                 dominant_lc == "human_3scp" ~ "Human"))
 
 
 # 5. Make respiration maps -----------------------------------------------------
 
-make_map <- function(var){
-  scaling_map_sf
+wrb_rel_height = 0.6
+
+make_map <- function(var, color_scheme, color_direction, y_lab){
+  
+  min_color = min(scaling_map_sf %>% pull({{var}}), na.rm = T)
+  max_color = max(scaling_map_sf %>% pull({{var}}), na.rm = T)
+  
+  yrb <- ggplot() +
+    geom_sf(data = scaling_map_sf %>% filter(basin == "yakima"), 
+            aes(color = {{var}}), show.legend = T) + 
+    geom_sf(data = yakima_boundary, fill = NA, color = "black", lwd = 0.8) + 
+    scale_color_viridis_c(option = color_scheme, 
+                          direction = color_direction,
+                          trans = "log10", 
+                          limits = c(min_color, max_color)) + 
+    theme_map() + 
+    labs(color = y_lab) + 
+    theme(legend.background = element_blank()) + 
+    theme(legend.position = "bottom", 
+          legend.justification = "center") + 
+    guides(colour = guide_colourbar(title.position="top", title.hjust = 0.5)) 
+  
+  wrb <- ggplot() +
+    geom_sf(data = scaling_map_sf %>% filter(basin == "willamette"), 
+            aes(color = {{var}}), show.legend = F) + 
+    geom_sf(data = willamette_boundary, fill = NA, color = "black", lwd = 0.8) + 
+    scale_color_viridis_c(option = color_scheme,
+                          direction = color_direction,
+                          trans = "log10", 
+                          limits = c(min_color, max_color)) + 
+    theme_map() 
+  
+  plot_grid(wrb, yrb, 
+            ncol = 1, 
+            rel_heights = c(wrb_rel_height, 1))
 }
 
-ggplot() +
+## Because landscape is categorical, we can't use that function and have to manually modify
+
+yrb_landscape <- ggplot() +
   geom_sf(data = scaling_map_sf %>% filter(basin == "yakima"), 
-          aes(color = accm_totco2_o2g_day), show.legend = F) + 
-  geom_sf(data = yakima_boundary, fill = NA, color = "black") + 
-  scale_color_viridis_c(trans = "log10") + 
+          aes(color = dominant_lc), show.legend = T) + 
+  geom_sf(data = yakima_boundary, fill = NA, color = "black", lwd = 0.8) + 
+  scale_color_viridis_d() + 
   theme_map() + 
-  labs(color = "Cumulative \n Respiration \n (gCO2/d)") + 
-  theme(legend.position = c(0.8, 0.7), 
-        legend.background = element_blank())
+  labs(color = "Dominant landscape") + 
+  theme(legend.background = element_blank()) + 
+  theme(legend.position = "bottom", 
+        legend.justification = "center") + 
+  guides(colour = guide_legend(title.position="top", title.hjust = 0.5)) 
+
+wrb_landscape <- ggplot() +
+  geom_sf(data = scaling_map_sf %>% filter(basin == "willamette"), 
+          aes(color = dominant_lc), show.legend = F) + 
+  geom_sf(data = willamette_boundary, fill = NA, color = "black", lwd = 0.8) + 
+  scale_color_viridis_d() + 
+  theme_map() 
+
+landscape_plot <- plot_grid(wrb_landscape, yrb_landscape, 
+          ncol = 1, 
+          rel_heights = c(wrb_rel_height, 1))
+
+plot_grid(make_map(log_mean_ann_pcpt_mm, "turbo", -1, "Precipitation (log-mm)"),
+          make_map(wshd_avg_elevation_m, "inferno", 1, "Elevation (m)"),
+          landscape_plot, 
+          #make_map(tot_q_hz_ms, "mako", -1, "HEF (m/s"),
+          make_map(accm_water_exchng_kg_d, "mako", -1, "HEF (m/s)"),
+          make_map(accm_totco2_o2g_day, "viridis", -1, "Cumulative Respiration (gCO2/d)"),
+          nrow = 1)
+ggsave("figures/1_Figure1_unformatted.png", width = 15, height = 10)
+ggsave("figures/1_Figure1_unformatted.pdf", width = 15, height = 10)
 
 
 
+scaling_no_sf <- scaling_map_sf %>% 
+  st_drop_geometry() 
 
-## Calculate stats to match colors between maps (facet_wrap(..., scales = F) fails w coord_sf)
-min_resp = min(scaling_dat_trimmed$accm_totco2_o2g_day)
-max_resp = max(scaling_dat_trimmed$accm_totco2_o2g_day)
+p1 <- scaling_no_sf %>% 
+  ggplot(aes(wshd_avg_elevation_m, accm_water_exchng_kg_d)) + 
+  geom_point(alpha = 0.05) + 
+  scale_x_log10() + 
+  scale_y_log10() + 
+  facet_wrap(~basin, scale = "free") + 
+  labs(x = "Elevation (m)", y = "Cumulative HEF (kg/d)")
 
-## Make a respiration map for the YRB
-yrb_resp <- ggplot() +
-  geom_sf(data = scaling_map_sf %>% filter(basin == "yakima"), 
-          aes(color = accm_totco2_o2g_day), show.legend = F) + 
-  geom_sf(data = yakima_boundary, fill = NA, color = "black") + 
-  scale_color_viridis_c(trans = "log10", limits = c(min_resp, max_resp)) + 
-  theme_map() + 
-  labs(color = "Cumulative \n Respiration \n (gCO2/d)") + 
-  theme(legend.position = c(0.8, 0.7), 
-        legend.background = element_blank())
+p2 <- scaling_no_sf %>% 
+  ggplot(aes(wshd_area_km2, accm_water_exchng_kg_d)) + 
+  geom_point(alpha = 0.05) + 
+  scale_x_log10() + 
+  scale_y_log10() + 
+  facet_wrap(~basin, scale = "free") + 
+  labs(x = "Watershed area (km2)", y = "Cumulative HEF (kg/d)")
 
-## Make a respiration map for the WRB
-wrb_resp <- ggplot() +
-  geom_sf(data = scaling_map_sf %>% filter(basin == "willamette"), aes(color = accm_totco2_o2g_day)) + 
-  geom_sf(data = willamette_boundary, fill = NA, color = "black") + 
-  scale_color_viridis_c(trans = "log10", limits = c(min_resp, max_resp)) + 
-  theme_map() + 
-  labs(color = "Cumulative \n Respiration \n (gCO2/d)")
-
-
-# 6. Assemble plots and export -------------------------------------------------
-
-## There's a new issue with get_legend caused by a recent ggplot update. Since
-## code was written prior to that update, I'm using a work-around provided by
-## clauswilke here: https://github.com/wilkelab/cowplot/issues/202
-
-get_legend_35 <- function(plot) {
-  # return all legend candidates
-  legends <- get_plot_component(plot, "guide-box", return_all = TRUE)
-  # find non-zero legends
-  nonzero <- vapply(legends, \(x) !inherits(x, "zeroGrob"), TRUE)
-  idx <- which(nonzero)
-  # return first non-zero legend if exists, and otherwise first element (which will be a zeroGrob) 
-  if (length(idx) > 0) {
-    return(legends[[idx[1]]])
-  } else {
-    return(legends[[1]])
-  }
-}
-
-## Pull the legend as a separate object
-resp_legend = get_legend_35(wrb_resp + 
-                              theme(legend.position = c(0.5, 0.3)))
-
-## Create the final plot by combining plot objects
-plot_grid(wa_or_plot, 
-          yrb_resp, 
-          wrb_resp + theme(legend.position = "none"),
-          resp_legend, 
-          nrow = 1, 
-          rel_widths = c(1, 1, 0.9, 0.4), 
-          labels = c("A", "B", "C"))
-
-## Save layers as raw figure, which is then cleaned up in Affinity Designer
-ggsave("figures/1_raw_Figure1_maps.pdf", width = 12, height = 4)
+plot_grid(p1, p2, ncol = 1)
+ggsave("figures/sd_elevation_v_HEF.png", width = 7, height = 7)
 
