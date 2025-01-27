@@ -95,8 +95,8 @@ make_scaling_plot <- function(selected_basin, title){
     #       axis.text=element_text(size=12),
     #      axis.title=element_text(size=12), 
     #      axis.text.y = element_text(angle = 30, vjust = 0.5, hjust=1)) + 
-    labs(color = "") + 
-    coord_sf(crs = coord_sf_crs)
+    labs(color = "") #+ 
+    #coord_sf(crs = coord_sf_crs)
 }
 
 scaling_plot <- plot_grid(make_scaling_plot("Yakima River (Dry)", "Yakima River (YRB)") + 
@@ -187,13 +187,22 @@ wrb_faceted_scaling <- make_scaling_plot("Willamette River (Wet)", "Willamette R
   scale_color_manual(values = color_mapping) + 
   facet_wrap(~scaling, nrow = 1, drop = F)
 
-plot_grid(yrb_faceted_scaling, 
-          wrb_faceted_scaling, 
-          ncol = 1, 
-          rel_heights = c(1, 1), 
-          align = "hv")
-ggsave("figures/4_Figure4.png", width = 12, height = 8)
-ggsave("figures/4_Figure4.pdf", width = 12, height = 8)
+## plot_grid is distorting the aspect ratio of YRB
+# plot_grid(yrb_faceted_scaling, 
+#           wrb_faceted_scaling, 
+#           ncol = 1, 
+#           rel_heights = c(0.6, 1), 
+#           align = "h")
+
+## Chat suggests patchwork instead
+p_load(patchwork)
+
+combined_plot <- yrb_faceted_scaling / wrb_faceted_scaling + 
+  plot_layout(ncol = 1, heights = c(0.595, 1))
+
+combined_plot
+ggsave("figures/4_Figure4.png", width = 11, height = 7)
+ggsave("figures/4_Figure4.pdf", width = 11, height = 7)
 
 
 ## Make example plot of what binning by HUC would look like --------------------
