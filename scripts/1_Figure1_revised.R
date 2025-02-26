@@ -182,3 +182,6 @@ p2 <- scaling_no_sf %>%
 plot_grid(p1, p2, ncol = 1)
 ggsave("figures/sd_elevation_v_HEF.png", width = 7, height = 7)
 
+
+
+
