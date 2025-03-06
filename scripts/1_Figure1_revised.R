@@ -149,14 +149,20 @@ landscape_plot <- plot_grid(wrb_landscape, yrb_landscape,
           rel_heights = c(wrb_rel_height, 1))
 
 plot_grid(make_map(log_mean_ann_pcpt_mm, "turbo", -1, "Precipitation (log-mm)"),
+          NULL,
           make_map(wshd_avg_elevation_m, "inferno", 1, "Elevation (m)"),
+          NULL,
           landscape_plot, 
-          #make_map(tot_q_hz_ms, "mako", -1, "HEF (m/s"),
+          NULL,
           make_map(accm_water_exchng_kg_d, "mako", -1, "HEF (m/s)"),
+          NULL,
           make_map(accm_totco2_o2g_day, "viridis", -1, "Cumulative Respiration (gCO2/d)"),
+          rel_widths = c(1, 0, 1, 0, 1, 0, 1, 0, 1),
           nrow = 1)
 ggsave("figures/1_Figure1_unformatted.png", width = 15, height = 10)
 ggsave("figures/1_Figure1_unformatted.pdf", width = 15, height = 10)
+
+
 
 
 
@@ -184,4 +190,18 @@ ggsave("figures/sd_elevation_v_HEF.png", width = 7, height = 7)
 
 
 
+
+ggplot() +
+  geom_sf(data = scaling_map_sf %>% filter(basin == "yakima"), 
+          aes(color = accm_totco2_o2g_day), show.legend = T) + 
+  geom_sf(data = yakima_boundary, fill = NA, color = "black", lwd = 0.8) + 
+  scale_color_viridis_c(option = "turbo", 
+                        direction = 1,
+                        trans = "log10") + 
+  theme_map() + 
+  labs(color = "Cumulative respiration") + 
+  theme(legend.background = element_blank()) + 
+  theme(legend.position = "bottom", 
+        legend.justification = "center") + 
+  guides(colour = guide_colourbar(title.position="top", title.hjust = 0.5)) 
 
