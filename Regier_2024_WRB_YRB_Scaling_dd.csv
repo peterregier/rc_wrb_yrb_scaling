@@ -1,0 +1,151 @@
+Column_or_Row_Name,Unit,Definition,Data_Type
+accm_doc_load_kg_d,kilograms per day,Cumulative dissolved organic carbon loads.,numeric
+accm_hzt_cat,N/A,Hyporheic exchange flux (categorical).,numeric
+accm_inc_comid,N/A,Number of upstream common identifiers (COMIDs).,numeric
+accm_mean_ann_pcpt_m3,cubic meters,Cumulative mean annual precipitation.,numeric
+accm_mean_ann_pcpt_mm,millimeters,Cumulative mean annual precipitation.,numeric
+accm_mean_ann_runf_mm,millimeters,Cumulative mean annual runoff.,numeric
+accm_no3_load_kg_d,kilograms per day,Cumulative nitrate load.,numeric
+accm_reach_length_km,kilometers,Cumulative reach length.,numeric
+accm_stream_area_m2,square meters,Cumulative stream surface area.,numeric
+accm_totco2_ang_day,grams of carbon per day,Cumulative hyporheic respiration as anaerobic respiration.,numeric
+accm_totco2_o2g_day,grams of carbon per day,Cumulative hyporheic respiration as aerobic respiration.,numeric
+accm_totco2g_day,grams of carbon per day,Total cumulative hyporheic respiration.,numeric
+accm_water_exchng_kg_d,kilograms per day,Cumulative water exchange flux.,numeric
+accm_wshd_stream_dens,N/A,Cumulative watershed stream density.,numeric
+are_cat,N/A,Catchment area (categorical).,text
+barren,percent,Barren land-cover.,numeric
+barren_scp,percent,Percent of land cover associated with barren land cover.,numeric
+basin,N/A,Basin.,text
+basin_cat,N/A,Basin (categorical).,text
+bnkfll_depth_m,meters,Bankfull stream depth.,numeric
+bnkfll_width_m,meters,Bankfull stream width.,numeric
+bnkfll_xsec_area_m2,square meters,Bankfull area.,numeric
+Column_or_Row_Name,N/A,Column or row headers from each csv file in the dataset.,text
+comid,N/A,Stream reach COMID. COMID is a common identifier for catchment polygons used by National Hydrography Dataset Plus (NHDPlus).,numeric
+crops,percent,Crops land-cover.,numeric
+ctch_area_km2,square kilometers,Catchment area.,numeric
+ctch_avg_elevation_m,meters,Catchment average elevation.,numeric
+ctch_basin_slope,N/A,Catchment basin slope.,numeric
+ctch_max_elevation_m,meters,Catchment maximum elevation.,numeric
+ctch_min_elevation_m,meters,Minimum catchment elevation.,numeric
+ctch_stream_dens,N/A,Catchment stream density.,numeric
+d50_cat,N/A,Median particle size distribution (categorical).,text
+d50_m,meters,Median particle size distribution.,numeric
+Data_Type,N/A,Type of data (numeric; text; date; time; datetime).,text
+Definition,N/A,Description of the information in a given column or row in the dataset.,text
+developed_hg,percent,Developed land-cover - high.,numeric
+developed_lw,percent,Developed land-cover - low.,numeric
+developed_md,percent,Developed land-cover - moderate.,numeric
+developed_op,percent,Developed land-cover - open space.,numeric
+do_stream_mg_l,milligrams per liter,Stream dissolved oxygen concentration.,numeric
+doc_load_kg_d,kilograms per day,Stream dissolved organic carbon load.,numeric
+doc_stream_mg_l,milligrams per liter,Stream dissolved organic carbon concentration.,numeric
+down_wshd_area_km2,square kilometers,Downstream watershed area.,numeric
+ent_cat,N/A,"The quotient of Shannon's entropy of forested and shrubland land cover and log(6,2) - categorized into quantiles (Q10 - Q100).",text
+File_Description,N/A,A brief description of the files in the data package.,text
+File_Name,N/A,Name of files in the data package.,text
+File_Path,N/A,File path within the data package.,text
+forest_3_area_km2,square kilometers,Forested land cover normalized to watershed area for land-cover grouped into three types.,numeric
+forest_3scp,N/A,Percent of land cover associated with forests for land-cover grouped into three types.,text
+forest_area_cat,N/A,Forested land cover (categorical).,text
+forest_dcd,percent,Deciduous forest land-cover.,numeric
+forest_evg,percent,Evergreen forest land-cover.,numeric
+forest_mxd,percent,Mixed forest land-cover.,numeric
+forest_scp,percent,Percent of land cover associated with forests.,numeric
+from_node,N/A,The upstream node of a flowline.,numeric
+frs3_cat,N/A,Percent of land cover associated with forests (categorized into 10 quantiles)  for land-cover grouped into three types.,text
+grass,percent,Grass land-cover.,numeric
+grass_scp,percent,Percent of land cover associated with grasslands.,numeric
+h_hw,N/A,Binary for if a reach has a stream order of 1 or not.,numeric
+h_nw,N/A,Binary for if a reach has a stream order of 1 or not multiplied by the ratio of watershed area to the downstream watershed area.,numeric
+h_tot,N/A,The product of h_hw and h_nw.,numeric
+hmax_3,N/A,"Constant: log(3,2).",numeric
+hr3_cat,N/A,"The quotient of Shannon's entropy of forested and shrubland land cover and log(6,2) (categorized).",text
+hrel,N/A,"The quotient of Shannon's entropy of forested and shrubland land cover and log(6,2).",numeric
+hrel_3,N/A,"The quotient of Shannon's entropy of forested and shrubland land cover and log(6,2).",numeric
+ht,N/A,Shannon's entropy of forested and shrubland land cover.,numeric
+ht_3,N/A,Shannon's entropy of forested and shrubland land cover for land-cover grouped into three types.,numeric
+human_3_area_km2,square kilometers,Percent of land cover associated with human modification normalized to watershed area for land-cover grouped into three types.,numeric
+human_3scp,percent,Percent of land cover associated with human modification for land-cover grouped into three types.,numeric
+human_area_cat,N/A,Percent of land cover associated with human modification (categorized).,text
+human_scp,percent,Percent of land cover associated with human modification.,numeric
+hydroseq,N/A,National Hydrography Dataset Plus (NHDPlus) reach network identifier.,numeric
+hzt_cat,N/A,Hyporheic exchange flux (categorical).,text
+Intercept,grams carbon per day,Linear regression y-intercept.,numeric
+InterceptCI_2.5,grams carbon per day,The 2.5% confidence interval for the linear regression y-intercept.,numeric
+InterceptCI_97.5,grams carbon per day,The 97.5% confidence interval for the linear regression y-intercept.,numeric
+latitude,decimal_degrees_WGS1984,Latitude.,numeric
+longitude,decimal_degrees_WGS1984,Longitude.,numeric
+mean_ann_flow_m3s,cubic meters per second,Mean annual discharge.,numeric
+mean_ann_pcpt_m3,cubic meters,Mean annual precipitation.,numeric
+mean_ann_pcpt_mm,millimeters,Mean annual precipitation.,numeric
+mean_ann_runf_mm,millimeters,Mean annual runoff.,numeric
+mean_ann_temp_dc,degrees Celsius,Mean annual temperature.,numeric
+mean_ann_vel_ms,meters per second,Mean annual water velocity.,numeric
+mi,N/A,Mutual information.,numeric
+Missing_Value_Codes,N/A,"Cells with missing data are represented with a missing value code rather than an empty cell. This column describes which missing value codes were used. The recommendation for numeric data is ""-9999"" and for character data is ""N/A"".",text
+no3_load_kg_d,kilograms per day,Stream nitrate load.,numeric
+no3_stream_mg_l,milligrams per liter,Stream nitrate concentration.,numeric
+pasture,percent,Pasture land-cover.,numeric
+pct_cat,N/A,Mean annual precipitation (categorical).,text
+q_hz_lat_ms,meters per second,Lateral hyporheic exchange flux.,numeric
+q_hz_ver_ms,meters per second,Vertical hyporheic exchange flux.,numeric
+quantile,N/A,Quantile of cumulative hyporheic exchange flux.,text
+reach_length_km,kilometers,Reach length.,numeric
+reach_slope,N/A,Reach slope.,numeric
+reach_type,N/A,National Hydrography Dataset Plus (NHDPlus) stream reach type.,text
+reachcode,N/A,"A unique, permanent identifier in the National Hydrography Dataset (NHD) associated with each NHD reach.",numeric
+RMSE,N/A,Root mean square error.,numeric
+rnf_cat,N/A,Mean annual runoff (categorical).,text
+roughness,N/A,Manning's roughness coefficient.,numeric
+RSquared,N/A,Linear regression coefficient of determination.,numeric
+RSquaredCI_2.5,N/A,The 2.5 percent confidence interval for the linear regression coefficient of determination.,numeric
+RSquaredCI_97.5,N/A,The 97.5 percent confidence interval for the linear regression coefficient of determination.,numeric
+rst_cat,N/A,Hyporheic residence time (categorical).,text
+rt_hz_lat_s,per second,Lateral hyporheic residence time.,numeric
+rt_hz_ver_s,per second,Vertical hyporheic residence time.,numeric
+shrub,percent,Shrub land-cover.,numeric
+shrub_3_area_km2,square kilometers,Percent of land cover associated with scrubland normalized to watershed area for land-cover grouped into three types.,numeric
+shrub_3scp,percent,Percent of land cover associated with scrubland for land-cover grouped into three types.,numeric
+shrub_area_cat,N/A,Percent of land cover associated with scrubland (categorical).,text
+shrub_scp,percent,Percent of land cover associated with scrubland.,numeric
+simpson_d,N/A,Simpson's diversity index.,numeric
+simpson_d3,N/A,Simpson's diversity index based on three land-cover types.,numeric
+Slope,grams carbon per day per square kilometer,Linear regression slope.,numeric
+SlopeCI_2.5,grams carbon per day per square kilometer,The 2.5 percent confidence interval for the linear regression slope.,numeric
+SlopeCI_97.5,grams carbon per day per square kilometer,The 97.5 percent confidence interval for the linear regression slope.,numeric
+smp_cat,N/A,Simpson's diversity index (categorical).,text
+smp3_cat,N/A,Simpson's diversity index based on three land-cover types (categorical).,text
+snow,percent,Snow land-cover.,numeric
+SSR,N/A,Sum of squared residuals.,numeric
+Standard,N/A,ESS-DIVE Reporting Format or other standard applied to the data file.,text
+sto_fct,N/A,Stream order (categorical).,text
+stream_area_m2,square meters,Stream surface area.,numeric
+stream_order,N/A,Stream order.,numeric
+stream_width_m,meters,Stream width.,numeric
+to_node,N/A,The downstream node of a flowline.,numeric
+tocomid,N/A,The common identifier (COMID) for the reach downstream of each reach.,numeric
+tot_q_hz_ms,meters per second,Hyporheic exchange flux.,numeric
+tot_rt_hz_s,per second,Hyporheic residence time.,numeric
+totco2_ang_day,grams of carbon per day,Anaerobic hyporheic respiration.,numeric
+totco2_ang_m2_day,grams of carbon per meter per day,Anaerobic hyporheic respiration normalized to reach length.,numeric
+totco2_o2g_day,grams of carbon per day,Aerobic hyporheic respiration.,numeric
+totco2_o2g_m2_day,grams of carbon per meter per day,Aerobic hyporheic respiration normalized to reach length.,numeric
+totco2g,grams of carbon,Total (anaerobic + aerobic) hyporheic respiration.,numeric
+totco2g_day,grams of carbon per day,Total (anaerobic + aerobic) hyporheic respiration.,numeric
+totco2g_m2_day,grams of carbon per meter per day,Total (anaerobic + aerobic) hyporheic respiration normalized to reach length.,numeric
+Unit,N/A,Unit of measurement that applies to a given column or row in the data package.,text
+vars,N/A,Variable.,text
+water,percent,Water land-cover.,numeric
+water_exchng_kg_d,kilograms per day,Water exchange load.,numeric
+water_scp,percent,Percent of land cover associated with water or wetlands.,numeric
+weight,ratio,The ratio of watershed area to the downstream watershed area.,numeric
+wetland_herb,percent,Herbaceous wetland land-cover.,numeric
+wetland_wood,percent,Wooded wetland land-cover.,numeric
+wshd_area_km2,square kilometers,Watershed area.,numeric
+wshd_avg_elevation_m,meters,Watershed average  elevation.,numeric
+wshd_basin_slope,percent,Watershed-scale basin slope.,numeric
+wshd_max_elevation_m,meters,Watershed maximum elevation.,numeric
+wshd_min_elevation_m,meters,Watershed minimum elevation.,numeric
+wshd_stream_dens,N/A,Watershed stream density.,numeric
