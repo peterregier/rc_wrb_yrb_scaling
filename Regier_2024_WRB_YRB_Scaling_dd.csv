@@ -1,6 +1,6 @@
 Column_or_Row_Name,Unit,Definition,Data_Type
 accm_doc_load_kg_d,kilograms per day,Cumulative dissolved organic carbon loads.,numeric
-accm_hzt_cat,N/A,Hyporheic exchange flux (categorical).,numeric
+accm_hzt_cat,N/A,Hyporheic exchange flux (categorical).,text
 accm_inc_comid,N/A,Number of upstream common identifiers (COMIDs).,numeric
 accm_mean_ann_pcpt_m3,cubic meters,Cumulative mean annual precipitation.,numeric
 accm_mean_ann_pcpt_mm,millimeters,Cumulative mean annual precipitation.,numeric
